@@ -3,9 +3,9 @@ close all
 clc
 
 station = 'LGTS';
-DATE    = '20241011';   % end time !!
+DATE    = '20241012';   % end time !!
 
-filename = ['SFC_' station '_' DATE '.html'];
+filename = ['SFC_' station '_' DATE '.htm'];
 %startRow = 13;
 %endRow   = 49;
 
