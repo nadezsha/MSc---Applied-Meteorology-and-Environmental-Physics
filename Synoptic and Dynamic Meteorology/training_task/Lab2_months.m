@@ -25,7 +25,11 @@ daily_mean_wspd = NaN(1, length(dates));
 daily_max_rhum = NaN(1, length(dates));
 daily_min_rhum = NaN(1, length(dates));
 daily_mean_rhum = NaN(1, length(dates));
+
+
+% Initialize array to store daily weather binary (1 if "RA" or "DZ", 0 otherwise)
 daily_weather_binary = NaN(1, length(dates));
+
 
 for i = 1:length(dates)
     DATE = dates{i};   % Current date in the loop
@@ -46,7 +50,37 @@ for i = 1:length(dates)
     RHUM = str2double(mat(:, 6));
     WDIR = str2double(mat(:, 7));  
     WSPD = str2double(mat(:, 8));  
-    weather = mat(:, end);
+
+    if size(mat, 2) >= 10
+        CLOUDS = mat(:, 10);
+    else
+        CLOUDS = cell(size(mat, 1), 1); % Create an empty column for consistency
+        warning(['File ', filename, ' does not contain a 10th column.']);
+    end
+
+
+    % Check if any of the rain or drizzle variants exist in the whole mat array
+    weather_conditions = {'RA', 'DZ', '+RA', '-RA', '+DZ', '-DZ', 'TSRA', '+TSRA', '-TSRA', 'SHRA', '-SHRA', '+SHRA'};
+    if any(ismember(mat(:), weather_conditions))
+        daily_weather_binary(i) = 1; % At least one condition found
+    else
+        daily_weather_binary(i) = 0; % None of the conditions found
+    end
+
+
+    % Initialize matrices for daily WSPD and WDIR
+    daily_wspd_matrix = NaN(length(dates), size(mat, 1)); 
+    daily_wdir_matrix = NaN(length(dates), size(mat, 1));
+
+    % Extract WSPD and WDIR for the current day
+    WSPD = str2double(mat(:, 8)); % Assuming column 8 is WSPD
+    WDIR = str2double(mat(:, 7)); % Assuming column 7 is WDIR
+
+    % Store them in the respective matrices
+    daily_wspd_matrix(i, 1:length(WSPD)) = WSPD;
+    daily_wdir_matrix(i, 1:length(WDIR)) = WDIR;
+    end
+
 
     daytime = split(mat(:, 2), '/');
     time1 = str2double(daytime(:, 2));
@@ -56,10 +90,10 @@ for i = 1:length(dates)
 
     % weather column for rainfall
     
-    weather_binary = cellfun(@(x)~isempty(x),weather); % 0 if empty, 1 otherwise
+    cloud_binary = cellfun(@(x)~isempty(x),CLOUDS); % 0 if empty, 1 otherwise
     
 
-    %% C plot matrix
+    %% C plot daily data
     %figure
     %subplot(2, 3, 1)
     %plot(tstamp, TEMP, 'o'); xlabel('Hour of the day'); ylabel('TEMP (C)'); hold on
@@ -108,6 +142,8 @@ for i = 1:length(dates)
     %disp('Indices:')
     %disp(['DTR = ', num2str(DTR, '%10.2f\n')])
 
+%% E plot max, min, mean
+
     % Store the daily temperatures
     daily_max_temp(i) = max(TEMP);
     daily_min_temp(i) = min(TEMP);
@@ -123,12 +159,14 @@ for i = 1:length(dates)
     daily_min_rhum(i) = min(RHUM);
     daily_mean_rhum(i) = mean(RHUM,'omitnan')
 
-    % Rainfall of the day
-    daily_weather_binary(i) = any(weather_binary);
+    % clouds
+    daily_cloud_binary(i) = any(cloud_binary);
+
+    % Optionally log results for debugging
+    fprintf('Processed %s: Weather Binary = %d\n', DATE, daily_weather_binary(i));
 
     % Optionally, save the plot with the date
     % saveas(gcf, ['SFC_' station '_' DATE '.png']);
-end
 
 % Convert dates to datetime
 dates_dt = datetime(dates, 'InputFormat', 'yyyyMMdd');
@@ -210,14 +248,41 @@ dates_dt = datetime(dates, 'InputFormat', 'yyyyMMdd');
 % grid on;
 
 
-%% D plot binary weather data
+%% F plot cloud data
 
-figure;
-stem(dates_dt, daily_weather_binary, 'LineWidth',2);
-xlabel('Date');
-ylabel('Rainfall');
-set(gca, 'YTick', [0 1]);
-ylim([-0.1,1.1]);
-title('Daily Rainfall');
-grid on;
-xtickangle(45);
+% figure;
+% stem(dates_dt, daily_cloud_binary, 'LineWidth',2);
+% xlabel('Date');
+% ylabel('Clouds');
+% set(gca, 'YTick', [0 1]);
+% ylim([-0.1,1.1]);
+% title('Daily Cloudiness');
+% grid on;
+% xtickangle(45);
+
+%% G Rainfall
+
+% figure;
+% stem(dates_dt, daily_weather_binary, 'LineWidth', 2, 'MarkerSize', 8);
+% xlabel('Date');
+% ylabel('Rainfall');
+% title('Daily Presence of Rain or Drizzle');
+% set(gca, 'YTick', [0 1]); % Set y-axis to only display 0 and 1
+% ylim([-0.1, 1.1]);       % Adjust limits slightly for better visualization
+% grid on;
+% xtickangle(45);
+
+%% H wind rose
+
+% % Flatten matrices into 1D arrays
+% all_wspd = daily_wspd_matrix(:);
+% all_wdir = daily_wdir_matrix(:);
+% 
+% % Remove NaN values
+% valid_indices = ~isnan(all_wspd) & ~isnan(all_wdir);
+% all_wspd = all_wspd(valid_indices);
+% all_wdir = all_wdir(valid_indices);
+% 
+% % Plot the wind rose
+% WindRose(all_wdir, all_wspd,'ndirections',16,'anglenorth',0,'angleeast',90,'labels',{'N (0�)','S (180�)','E (90�)','W (270�)'},'freqlabelangle',22.5);
+% set(gca,'Fontsize',16)
