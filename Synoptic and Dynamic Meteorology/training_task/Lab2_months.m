@@ -403,54 +403,40 @@ fprintf('Relative Humidity (%%): Max = %.2f, Min = %.2f, Mean = %.2f, Std Dev = 
 
 %% Daily Statistics 
 
-specific_dates = ["2024-02-12", "2024-02-21", "2024-07-05", "2024-07-17"];
+% Define the specific date 
+specific_date_str = '20240715'; 
+specific_date = datetime(specific_date_str, 'InputFormat', 'yyyyMMdd');
 
-% Initialize results storage
-specific_date_stats = struct();
+% Find the index of the specific date in the dates array
+date_index = find(dates_dt == specific_date, 1);
 
-for i = 1:length(specific_dates)
-    % Select the date
-    date_to_check = datetime(specific_dates(i), 'InputFormat', 'yyyy-MM-dd');
-    
-    % Find indices for this date
-    idx = dateshift(dates_dt, 'start', 'day') == date_to_check;
-    
-    % Extract data for the specific date
-    temp_data = TEMP(idx);
-    wspd_data = WSPD(idx);
-    rhum_data = RHUM(idx);
-    
-    % Compute statistics for this date
-    specific_date_stats(i).date = date_to_check;
-    
-    % Temperature
-    specific_date_stats(i).temp_max = max(temp_data, [], 'omitnan');
-    specific_date_stats(i).temp_min = min(temp_data, [], 'omitnan');
-    specific_date_stats(i).temp_mean = mean(temp_data, 'omitnan');
-    specific_date_stats(i).temp_std = std(temp_data, 'omitnan');
-    
-    % Wind Speed
-    specific_date_stats(i).wspd_max = max(wspd_data, [], 'omitnan');
-    specific_date_stats(i).wspd_min = min(wspd_data, [], 'omitnan');
-    specific_date_stats(i).wspd_mean = mean(wspd_data, 'omitnan');
-    specific_date_stats(i).wspd_std = std(wspd_data, 'omitnan');
-    
-    % Relative Humidity
-    specific_date_stats(i).rhum_max = max(rhum_data, [], 'omitnan');
-    specific_date_stats(i).rhum_min = min(rhum_data, [], 'omitnan');
-    specific_date_stats(i).rhum_mean = mean(rhum_data, 'omitnan');
-    specific_date_stats(i).rhum_std = std(rhum_data, 'omitnan');
-end
+if ~isempty(date_index)
+    % Extract max, min, mean values for the specific date
+    specific_max_temp = daily_max_temp(date_index);
+    specific_min_temp = daily_min_temp(date_index);
+    specific_mean_temp = daily_mean_temp(date_index);
 
-% Display results for each date
-fprintf('Specific Date Statistics:\n');
-for i = 1:length(specific_dates)
-    stats = specific_date_stats(i);
-    fprintf('Date: %s\n', datestr(stats.date, 'yyyy-mm-dd'));
-    fprintf('  Temperature (°C): Max = %.2f, Min = %.2f, Mean = %.2f, Std Dev = %.2f\n', ...
-        stats.temp_max, stats.temp_min, stats.temp_mean, stats.temp_std);
-    fprintf('  Wind Speed (m/s): Max = %.2f, Min = %.2f, Mean = %.2f, Std Dev = %.2f\n', ...
-        stats.wspd_max, stats.wspd_min, stats.wspd_mean, stats.wspd_std);
-    fprintf('  Relative Humidity (%%): Max = %.2f, Min = %.2f, Mean = %.2f, Std Dev = %.2f\n', ...
-        stats.rhum_max, stats.rhum_min, stats.rhum_mean, stats.rhum_std);
+    specific_max_wspd = daily_max_wspd(date_index);
+    specific_min_wspd = daily_min_wspd(date_index);
+    specific_mean_wspd = daily_mean_wspd(date_index);
+
+    specific_max_rhum = daily_max_rhum(date_index);
+    specific_min_rhum = daily_min_rhum(date_index);
+    specific_mean_rhum = daily_mean_rhum(date_index);
+
+    % Calculate standard deviations for the specific date
+    specific_std_temp = std(TEMP, 'omitnan');
+    specific_std_wspd = std(WSPD, 'omitnan');
+    specific_std_rhum = std(RHUM, 'omitnan');
+
+    % Display the results
+    fprintf('Weather Data for %s:\n', specific_date_str);
+    fprintf('  Temperature: Max = %.2f, Min = %.2f, Mean = %.2f, Std Dev = %.2f\n', ...
+        specific_max_temp, specific_min_temp, specific_mean_temp, specific_std_temp);
+    fprintf('  Wind Speed:  Max = %.2f, Min = %.2f, Mean = %.2f, Std Dev = %.2f\n', ...
+        specific_max_wspd, specific_min_wspd, specific_mean_wspd, specific_std_wspd);
+    fprintf('  Humidity:    Max = %.2f, Min = %.2f, Mean = %.2f, Std Dev = %.2f\n', ...
+        specific_max_rhum, specific_min_rhum, specific_mean_rhum, specific_std_rhum);
+else
+    fprintf('Date %s not found in the data.\n', specific_date_str);
 end
