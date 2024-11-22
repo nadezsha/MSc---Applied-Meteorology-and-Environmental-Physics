@@ -7,7 +7,7 @@ station = 'LGTS';
 % List of dates to process
 %dates = {'20240201', '20240202', '20240203', '20240204', '20240205', '20240206', '20240207', '20240208', '20240209', '20240210','20240211', '20240212', '20240213', '20240214','20240215', '20240216', '20240217', '20240218','20240219', '20240220', '20240221', '20240222','20240223', '20240224', '20240225', '20240226','20240227', '20240228', '20240229'};  
 %dates = {'20240701', '20240702', '20240703', '20240704', '20240705', '20240706', '20240707', '20240708', '20240709', '20240710','20240711', '20240712', '20240713', '20240714','20240715', '20240716', '20240717', '20240718','20240719', '20240720', '20240721', '20240722','20240723', '20240724', '20240725', '20240726','20240727', '20240728', '20240729', '20240730', '20240731'};  
-dates = {'20240212'};
+dates = {'20240221'};
 
 %% Initial variables
 
@@ -58,53 +58,53 @@ for i = 1:length(dates)
     WSPD = str2double(mat(:, 8));  
 
 
-%     %Check if any of the rain or drizzle variants exist in the whole mat array
-%     if any(ismember(mat(:), weather_conditions))
-%         daily_weather_binary(i) = 1; % At least one condition found
-%     else
-%         daily_weather_binary(i) = 0; % None of the conditions found
-%     end
-% 
-%     % Check if the "CLOUDS" column exists (assuming columns 10, 11, 12, etc., are cloud information)
-%     if size(mat, 2) >= 10
-%         cloud_data = mat(:, 10:end);  % Extract all columns starting from the 10th
-%     else
-%         cloud_data = cell(size(mat, 1), 1); % Create an empty column for consistency
-%         warning(['File ', filename, ' does not contain a 10th column.']);
-%     end
-% 
-%     % Initialize an array to store the cloud types extracted from the "CLOUDS" data
-%     cloud_types = cell(size(cloud_data));
-% 
-%     % Extract the first 3 characters of the "CLOUDS" data, handling empty or short strings
-%     for j = 1:length(cloud_data)
-%         for k = 1:size(cloud_data, 2)
-%             % Only extract the first 3 characters if the string has at least 3 characters
-%             if ~isempty(cloud_data{j, k}) && length(cloud_data{j, k}) >= 3
-%                 cloud_types{j, k} = cloud_data{j, k}(1:3);
-%             else
-%                 cloud_types{j, k} = '';  % Assign empty string if less than 3 characters
-%             end
-%         end
-%     end
-% 
-%     % Map cloud types to numerical values
-%     cloud_mapping = containers.Map({'FEW', 'SCT', 'BKN', 'OVC'}, {25, 50, 87.5, 100});
-% 
-%     % Initialize an array to store the numerical cloud values for this date
-%     cloud_values = NaN(size(cloud_types));
-% 
-%     % Convert cloud types into their respective numeric values
-%     for j = 1:size(cloud_types, 1)
-%         for k = 1:size(cloud_types, 2)
-%             if isKey(cloud_mapping, cloud_types{j, k})
-%                 cloud_values(j, k) = cloud_mapping(cloud_types{j, k});
-%             end
-%         end
-%     end
-% 
-%     % Find the maximum cloud coverage for the day across all columns
-%     daily_cloud_coverage(i) = max(max(cloud_values, [], 2), [], 'omitnan');
+    %Check if any of the rain or drizzle variants exist in the whole mat array
+    if any(ismember(mat(:), weather_conditions))
+        daily_weather_binary(i) = 1; % At least one condition found
+    else
+        daily_weather_binary(i) = 0; % None of the conditions found
+    end
+
+    % Check if the "CLOUDS" column exists (assuming columns 10, 11, 12, etc., are cloud information)
+    if size(mat, 2) >= 10
+        cloud_data = mat(:, 10:end);  % Extract all columns starting from the 10th
+    else
+        cloud_data = cell(size(mat, 1), 1); % Create an empty column for consistency
+        warning(['File ', filename, ' does not contain a 10th column.']);
+    end
+
+    % Initialize an array to store the cloud types extracted from the "CLOUDS" data
+    cloud_types = cell(size(cloud_data));
+
+    % Extract the first 3 characters of the "CLOUDS" data, handling empty or short strings
+    for j = 1:length(cloud_data)
+        for k = 1:size(cloud_data, 2)
+            % Only extract the first 3 characters if the string has at least 3 characters
+            if ~isempty(cloud_data{j, k}) && length(cloud_data{j, k}) >= 3
+                cloud_types{j, k} = cloud_data{j, k}(1:3);
+            else
+                cloud_types{j, k} = '';  % Assign empty string if less than 3 characters
+            end
+        end
+    end
+
+    % Map cloud types to numerical values
+    cloud_mapping = containers.Map({'FEW', 'SCT', 'BKN', 'OVC'}, {25, 50, 87.5, 100});
+
+    % Initialize an array to store the numerical cloud values for this date
+    cloud_values = NaN(size(cloud_types));
+
+    % Convert cloud types into their respective numeric values
+    for j = 1:size(cloud_types, 1)
+        for k = 1:size(cloud_types, 2)
+            if isKey(cloud_mapping, cloud_types{j, k})
+                cloud_values(j, k) = cloud_mapping(cloud_types{j, k});
+            end
+        end
+    end
+
+    % Find the maximum cloud coverage for the day across all columns
+    daily_cloud_coverage(i) = max(max(cloud_values, [], 2), [], 'omitnan');
 
     % 
     % % Initialize matrices for daily WSPD and WDIR
@@ -278,41 +278,28 @@ dates_dt = datetime(dates, 'InputFormat', 'yyyyMMdd');
 % set(gca, 'YTick', 0:3:24);
 
 %% Rain plot for the specific date
+end
 
-% % Define rain types and assign numerical values for plotting
-% rain_mapping = containers.Map({'No Rain', 'Drizzle', 'Shower', 'Thunderstorm'}, {0, 1, 2, 3});
-% rain_types_per_hour = NaN(24, 1);
+rain_per_hour = zeros(24, 1); % 0: Δεν υπάρχει βροχόπτωση, 1: Υπάρχει βροχόπτωση
 
-% % Populate rain_types_per_hour for the date
-% for h = 0:23
-%     indices = (hour == h);
-%     if any(indices)
-%         % Check the rain type for the hour
-%         if any(ismember(mat(indices, 9), {'DZ', '+DZ', '-DZ'})) 
-%             rain_types_per_hour(h + 1) = rain_mapping('Drizzle');
-%         elseif any(ismember(mat(indices, 9), {'SHRA', '+SHRA', '-SHRA'}))
-%             rain_types_per_hour(h + 1) = rain_mapping('Shower');
-%         elseif any(ismember(mat(indices, 9), {'TSRA', '+TSRA', '-TSRA'}))
-%             rain_types_per_hour(h + 1) = rain_mapping('Thunderstorm');
-%         else
-%             rain_types_per_hour(h + 1) = rain_mapping('No Rain');
-%         end
-%     else
-%         rain_types_per_hour(h + 1) = rain_mapping('No Rain');
-%     end
-% end
-% 
-% % Plot Rain Types Per Hour
-% hour_labels = arrayfun(@(x) sprintf('%02d:00', x), 0:23, 'UniformOutput', false);
-% subplot(2,3,6)
-% stairs(0:23, rain_types_per_hour, 'LineWidth', 2, 'Color', 'b');
-% yticks([0 1 2 3]);
-% yticklabels({'No Rain', 'Drizzle', 'Shower', 'Thunderstorm'});
-% xlabel('Hour of the Day');
-% ylabel('Rain Type');
-% grid on;
-% set(gca,'XTick',0:3:24,'XGrid','on','FontSize',14);xlim([0 24])
+for h = 0:23
+    indices = (hour == h);
+    hourly_data = mat(indices, :);
 
+    if ~isempty(hourly_data) && any(ismember(hourly_data(:), weather_conditions))
+        rain_per_hour(h + 1) = 1; 
+    end
+end
+
+figure;
+bar(0:23, rain_per_hour, 'FaceColor', 'b', 'EdgeColor', 'k', 'BarWidth', 0.6);
+xlabel('Hours');
+ylabel('Rainfall');
+title(['Rainfall for the date: ', DATE]);
+set(gca, 'YTick', [0 1]);
+xticks(0:23);
+xtickangle(0);
+grid on;
 
 %% Cloud plot for the specific date 
 % 
@@ -406,41 +393,41 @@ dates_dt = datetime(dates, 'InputFormat', 'yyyyMMdd');
 
 %% Daily Statistics 
 
-end
-% Define the specific date 
- specific_date_str = '20240212'; 
- specific_date = datetime(specific_date_str, 'InputFormat', 'yyyyMMdd');
-
-% Find the index of the specific date in the dates array
-date_index = find(dates_dt == specific_date, 1);
-
-if ~isempty(date_index)
-    % Extract max, min, mean values for the specific date
-    specific_max_temp = daily_max_temp(date_index);
-    specific_min_temp = daily_min_temp(date_index);
-    specific_mean_temp = daily_mean_temp(date_index);
-
-    specific_max_wspd = daily_max_wspd(date_index);
-    specific_min_wspd = daily_min_wspd(date_index);
-    specific_mean_wspd = daily_mean_wspd(date_index);
-
-    specific_max_rhum = daily_max_rhum(date_index);
-    specific_min_rhum = daily_min_rhum(date_index);
-    specific_mean_rhum = daily_mean_rhum(date_index);
-
-    % Calculate standard deviations for the specific date
-    specific_std_temp = std(TEMP, 'omitnan');
-    specific_std_wspd = std(WSPD, 'omitnan');
-    specific_std_rhum = std(RHUM, 'omitnan');
-
-    % Display the results
-    fprintf('Weather Data for %s:\n', specific_date);
-    fprintf('  Temperature: Max = %.2f, Min = %.2f, Mean = %.2f, Std Dev = %.2f\n', ...
-        specific_max_temp, specific_min_temp, specific_mean_temp, specific_std_temp);
-    fprintf('  Wind Speed:  Max = %.2f, Min = %.2f, Mean = %.2f, Std Dev = %.2f\n', ...
-        specific_max_wspd, specific_min_wspd, specific_mean_wspd, specific_std_wspd);
-    fprintf('  Humidity:    Max = %.2f, Min = %.2f, Mean = %.2f, Std Dev = %.2f\n', ...
-        specific_max_rhum, specific_min_rhum, specific_mean_rhum, specific_std_rhum);
-else
-    fprintf('Date %s not found in the data.\n', specific_date);
-end
+% end
+% % Define the specific date 
+%  specific_date_str = '20240212'; 
+%  specific_date = datetime(specific_date_str, 'InputFormat', 'yyyyMMdd');
+% 
+% % Find the index of the specific date in the dates array
+% date_index = find(dates_dt == specific_date, 1);
+% 
+% if ~isempty(date_index)
+%     % Extract max, min, mean values for the specific date
+%     specific_max_temp = daily_max_temp(date_index);
+%     specific_min_temp = daily_min_temp(date_index);
+%     specific_mean_temp = daily_mean_temp(date_index);
+% 
+%     specific_max_wspd = daily_max_wspd(date_index);
+%     specific_min_wspd = daily_min_wspd(date_index);
+%     specific_mean_wspd = daily_mean_wspd(date_index);
+% 
+%     specific_max_rhum = daily_max_rhum(date_index);
+%     specific_min_rhum = daily_min_rhum(date_index);
+%     specific_mean_rhum = daily_mean_rhum(date_index);
+% 
+%     % Calculate standard deviations for the specific date
+%     specific_std_temp = std(TEMP, 'omitnan');
+%     specific_std_wspd = std(WSPD, 'omitnan');
+%     specific_std_rhum = std(RHUM, 'omitnan');
+% 
+%     % Display the results
+%     fprintf('Weather Data for %s:\n', specific_date);
+%     fprintf('  Temperature: Max = %.2f, Min = %.2f, Mean = %.2f, Std Dev = %.2f\n', ...
+%         specific_max_temp, specific_min_temp, specific_mean_temp, specific_std_temp);
+%     fprintf('  Wind Speed:  Max = %.2f, Min = %.2f, Mean = %.2f, Std Dev = %.2f\n', ...
+%         specific_max_wspd, specific_min_wspd, specific_mean_wspd, specific_std_wspd);
+%     fprintf('  Humidity:    Max = %.2f, Min = %.2f, Mean = %.2f, Std Dev = %.2f\n', ...
+%         specific_max_rhum, specific_min_rhum, specific_mean_rhum, specific_std_rhum);
+% else
+%     fprintf('Date %s not found in the data.\n', specific_date);
+% end
