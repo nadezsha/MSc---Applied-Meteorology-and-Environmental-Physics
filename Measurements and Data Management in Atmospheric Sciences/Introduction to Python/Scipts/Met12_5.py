@@ -26,13 +26,19 @@ df.resample("M").mean()
 df["Tmax"].resample("M").mean()
 df["Tmin"].resample("M").mean()
 df["r"].resample("M").sum()
+df["r"].resample("M").sum().max()
+print(df["r"].resample("M").sum()[df["r"].resample("M").sum() == df["r"].resample("M").sum().max()])
 
 df["Tmax"].resample("Y").mean()
 df["Tmin"].resample("Y").mean()
 df["r"].resample("Y").sum()
 
 months=df.index.month
+print(months)
 monthly_avg=df.groupby(months).Tmax.mean()
+print(round(monthly_avg,1))
+type(monthly_avg)
 
 week=df.index.weekday
 weekly_avg=df.groupby(week).Tmax.mean()
+print(round(weekly_avg,1))
