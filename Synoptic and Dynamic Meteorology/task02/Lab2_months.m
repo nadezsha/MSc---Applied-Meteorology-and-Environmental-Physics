@@ -6,7 +6,7 @@ station = 17220;
 region  = 'europe';
 
 YY = 2024;
-MM = 2 ;
+MM = 7 ;
 
 numDays = eomday(YY, MM);
 
@@ -221,9 +221,11 @@ end
 %% TASK 1c - Timeseries : LCL, pricipitable water, reversal zone,saturation zone
  
 %Plot daily LCL
-figure;
+figure('Position', [100, 100, 800, 600]);
+
+% Subplot 1: Daily LCL Plot
 subplot(2,2,1);
-plot(1:numDays, LCL, 'o-', 'LineWidth', 1.5, 'DisplayName', 'LCL');
+plot(1:numDays, LCL, 'o-', 'LineWidth', 1.5);
 grid on;
 xlabel('Day of Month');
 ylabel('LCL (m)');
@@ -238,11 +240,6 @@ xlabel('Day of the Month');
 ylabel('Precipitable Water (mm)');
 title('Daily Precipitable Water for the Month');
 set(gca, 'FontSize', 12);
-if ~isempty(valid_lw)
-    ylim([min(valid_lw) - 0.5, max(valid_lw) + 0.5]);
-else
-    disp('No valid data available for daily precipitable water.');
-end
 
 
 % Reversal zones -> where the lapse rate increases with height
@@ -294,4 +291,3 @@ xlabel('Day of the Month');
 ylabel('Layer Height (km)');
 title('Saturation zones');
 set(gca, 'FontSize', 12);
-
