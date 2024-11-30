@@ -6,13 +6,13 @@ station = 17220;
 region  = 'europe';
 
 YY = 2024;
-MM = 7;
+MM = 2 ;
 
 numDays = eomday(YY, MM);
 
 %% Preparing the data
 
-pressureLevels = [1000, 925, 850, 700, 500]; % Desired pressure levels in hPa
+pressureLevels = [1000, 925, 850, 700, 500]; % hPa
 numLevels = numel(pressureLevels);
 
 % Calculate daily values for each isobaric level
@@ -20,7 +20,11 @@ dailyTEMP = NaN(numDays, numLevels);
 dailyHGHT = NaN(numDays, numLevels);  
 dailyWSPD = NaN(numDays, numLevels);  
 dailyRHUM = NaN(numDays, numLevels);  
-dailyThickness = NaN(numDays, 1);   
+dailyThickness = NaN(numDays, 1); 
+standTEMP = NaN(numDays, 1);  
+LCL = NaN(numDays,1);
+daily_lw = zeros(1, numDays);
+calculatedHeight = NaN(numDays, numLevels);
 
 for DD = 1:numDays
     HH = 0;
@@ -28,15 +32,25 @@ for DD = 1:numDays
     
     try
         % Download and process data
-        downloadUA(region, station, YY, MM, DD, HH);
+        downloadUA_1(region, station, YY, MM, DD, HH);
         [startRow, endRow] = read_UA_html(filename);
         mat = importfile(filename, startRow, endRow);
         
-        PRES = table2array(mat(:, 1));   % hPa
-        HGHT = table2array(mat(:, 2));   % m
-        TEMP = table2array(mat(:, 3));   % °C
-        RHUM = table2array(mat(:, 5));   % %
-        WSPD = table2array(mat(:, 8)) * 0.514; % m/s
+        PRES    = table2array( mat(:,1) );                 % hPa
+        HGHT    = table2array( mat(:,2) );                 % m
+        TEMP    = table2array( mat(:,3) );                 % C
+        DWPT    = table2array( mat(:,4) );                 % C
+        RHUM    = table2array( mat(:,5) );                 % g/kg
+        MIXR    = table2array( mat(:,6) );                 % g/kg
+        DRCT    = table2array( mat(:,7) );                 % deg
+        WSPD    = table2array( mat(:,8) ) * 0.514;         % m/s
+
+        EVPR    = (29/18) * PRES .* MIXR/1000;             % h
+        
+        % Calculate precipitation water
+        lw = sum(0.5 * (MIXR(1:end-1) + MIXR(2:end)) .* (-diff(PRES))) / 100000;
+        daily_lw(DD) = 1000 * lw; %
+        valid_lw = daily_lw(~isnan(daily_lw));
 
         % Store data for  ground level
         groundTEMP(DD) = TEMP(1);        
@@ -44,9 +58,11 @@ for DD = 1:numDays
         groundWSPD(DD) = WSPD(1);       
         groundRHUM(DD) = RHUM(1);     
         
-
         for ii = 1:numLevels
             pressureLevel = pressureLevels(ii);
+
+            % Calculate the height for the current pressure level using ground pressure
+            calculatedHeight(DD, ii) = -17 * log(pressureLevel / groundPRES(DD));
 
             % Find the index for the current pressure level
             [~, idx] = min(abs(PRES - pressureLevel));
@@ -56,6 +72,7 @@ for DD = 1:numDays
             dailyHGHT(DD, ii) = HGHT(idx) / 1000; % Convert to km
             dailyWSPD(DD, ii) = WSPD(idx);
             dailyRHUM(DD, ii) = RHUM(idx);
+        
         end
         
         % Calculate thickness (1000 hPa - 500 hPa)
@@ -63,6 +80,20 @@ for DD = 1:numDays
         [~, idx500] = min(abs(PRES - 500));
         dailyThickness(DD) = (HGHT(idx500) - HGHT(idx1000)) / 1000; % Convert to km
         
+        % Calculate standard atmosphere temp
+        standTEMP(DD) = groundTEMP(DD) - 6.5 * (dailyHGHT(DD, 1));
+
+
+        % Calculate LCL
+        if ~isnan(TEMP(1)) && ~isnan(DWPT(1))
+            LCL(DD) = ((TEMP(1) - DWPT(1)) * 125); % m
+        else
+            LCL(DD) = NaN; 
+        end
+
+        % % Calculate PW 
+        % PW(DD) = sum(0.5 * (MIXR(1:end-1) + MIXR(2:end)) .* (-diff(PRES))) / 100000;
+
     catch ME
         warning('Failed to process %s: %s', datestr(datenum(YY, MM, DD)), ME.message);
     end
@@ -71,59 +102,64 @@ end
 
 %% TASK 1a - Timeseries on isobaric levels
 
-% % Generate separate figures for each pressure level
-% for ii = 1:numLevels
-%     pressureLevel = pressureLevels(ii);
-% 
-%     figure;
-% 
-%     % Subplot 1: Temperature
-%     subplot(2, 2, 1);
-%     plot(1:numDays, dailyTEMP(:, ii), 'o-', 'LineWidth', 1.5, 'DisplayName', 'Temperature');
-%     grid on;
-%     xlabel('Day of Month');
-%     ylabel('Temperature (°C)');
-%     title(sprintf('Timeseries: Temperature at %.0f hPa', pressureLevel));
-%     set(gca, 'FontSize', 12);
-% 
-%     % Subplot 2: Height
-%     subplot(2, 2, 2);
-%     plot(1:numDays, dailyHGHT(:, ii), 'o-', 'LineWidth', 1.5, 'DisplayName', 'Height');
-%     grid on;
-%     xlabel('Day of Month');
-%     ylabel('Height (km)');
-%     title(sprintf('Timeseries: Height at %.0f hPa', pressureLevel));
-%     set(gca, 'FontSize', 12);
-% 
-%     % Subplot 3: Wind Speed
-%     subplot(2, 2, 3);
-%     plot(1:numDays, dailyWSPD(:, ii), 'o-', 'LineWidth', 1.5, 'DisplayName', 'Wind Speed');
-%     grid on;
-%     xlabel('Day of Month');
-%     ylabel('Wind Speed (m/s)');
-%     title(sprintf('Timeseries: Wind Speed at %.0f hPa', pressureLevel));
-%     set(gca, 'FontSize', 12);
-% 
-%     % Subplot 4: Relative Humidity
-%     subplot(2, 2, 4);
-%     plot(1:numDays, dailyRHUM(:, ii), 'o-', 'LineWidth', 1.5, 'DisplayName', 'Relative Humidity');
-%     grid on;
-%     xlabel('Day of Month');
-%     ylabel('Relative Humidity (%)');
-%     title(sprintf('Timeseries: Relative Humidity at %.0f hPa', pressureLevel));
-%     set(gca, 'FontSize', 12);
-% 
-%     % Add Thickness subplot after the 500 hPa figure
-%     if pressureLevel == 500
-%         figure; 
-%         plot(1:numDays, dailyThickness, 'o-', 'LineWidth', 1.5, 'DisplayName', 'Thickness 1000-500 hPa');
-%         grid on;
-%         xlabel('Day of Month');
-%         ylabel('Thickness (km)');
-%         title('Thickness between 1000 and 500 hPa');
-%         set(gca, 'FontSize', 12);
-%     end
-% end
+Generate separate figures for each pressure level
+for ii = 1:numLevels
+    pressureLevel = pressureLevels(ii);
+
+    figure;
+
+    % Subplot 1: Temperature
+    subplot(2, 2, 1);
+    hold on;
+    plot(1:numDays, dailyTEMP(:, ii), 'o-', 'LineWidth', 1.5, 'DisplayName', 'Observed Temperature');
+    plot(1:numDays, standTEMP, 'o-', 'LineWidth', 1.5, 'DisplayName', 'Standard Atmosphere Temperature');
+    grid on;
+    xlabel('Day of Month');
+    ylabel('Temperature (°C)');
+    title(sprintf('Timeseries: Temperature at %.0f hPa', pressureLevel));
+    legend('Location','Best')
+    set(gca, 'FontSize', 12);
+
+    % Subplot 2: Height
+    subplot(2, 2, 2);
+    hold on;
+    plot(1:numDays, dailyHGHT(:, ii), 'o-', 'LineWidth', 1.5, 'DisplayName', 'Height');
+    plot(1:numDays, calculatedHeight(:, ii), 'x-', 'LineWidth', 1.5, 'DisplayName', sprintf('Calculated Height at %.0f hPa', pressureLevel));
+    grid on;
+    xlabel('Day of Month');
+    ylabel('Height (km)');
+    title(sprintf('Timeseries: Height at %.0f hPa', pressureLevel));
+    set(gca, 'FontSize', 12);
+
+    % Subplot 3: Wind Speed
+    subplot(2, 2, 3);
+    plot(1:numDays, dailyWSPD(:, ii), 'o-', 'LineWidth', 1.5, 'DisplayName', 'Wind Speed');
+    grid on;
+    xlabel('Day of Month');
+    ylabel('Wind Speed (m/s)');
+    title(sprintf('Timeseries: Wind Speed at %.0f hPa', pressureLevel));
+    set(gca, 'FontSize', 12);
+
+    % Subplot 4: Relative Humidity
+    subplot(2, 2, 4);
+    plot(1:numDays, dailyRHUM(:, ii), 'o-', 'LineWidth', 1.5, 'DisplayName', 'Relative Humidity');
+    grid on;
+    xlabel('Day of Month');
+    ylabel('Relative Humidity (%)');
+    title(sprintf('Timeseries: Relative Humidity at %.0f hPa', pressureLevel));
+    set(gca, 'FontSize', 12);
+
+        % Add Thickness subplot after the 500 hPa figure
+        if pressureLevel == 500
+            figure;
+            plot(1:numDays, dailyThickness, 'o-', 'LineWidth', 1.5, 'DisplayName', 'Thickness 1000-500 hPa');
+            grid on;
+            xlabel('Day of Month');
+            ylabel('Thickness (km)');
+            title('Thickness between 1000 and 500 hPa');
+            set(gca, 'FontSize', 12);
+        end
+end
 
 
 %% TASK 1b - Timeseries on the ground
@@ -166,3 +202,29 @@ end
 % ylabel('Relative Humidity (%)');
 % title('Surface Relative Humidity');
 % set(gca, 'FontSize', 12);
+
+%% TASK 1c - Timeseries : LCL, pricipitable water, reversal zone,saturation zone
+ 
+% %Plot daily LCL
+% figure;
+% subplot(2,1,1);
+% plot(1:numDays, LCL, 'o-', 'LineWidth', 1.5, 'DisplayName', 'LCL');
+% grid on;
+% xlabel('Day of Month');
+% ylabel('LCL (m)');
+% title('Daily Lifting Condensation Level (LCL)');
+% set(gca, 'FontSize', 12);
+% 
+% % Plot the daily precipitation water
+% subplot(2,1,2);
+% plot(1:numDays, daily_lw, '-o', 'LineWidth', 1.5, 'MarkerSize', 6);
+% grid on;
+% xlabel('Day of the Month');
+% ylabel('Precipitable Water (mm)');
+% title('Daily Precipitable Water for the Month');
+% set(gca, 'FontSize', 12);
+% if ~isempty(valid_lw)
+%     ylim([min(valid_lw) - 0.5, max(valid_lw) + 0.5]);
+% else
+%     disp('No valid data available for daily precipitable water.');
+% end
