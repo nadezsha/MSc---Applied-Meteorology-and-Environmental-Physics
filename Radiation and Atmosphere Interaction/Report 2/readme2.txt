@@ -1,0 +1,28 @@
+how to run the model : 
+uvspec <2a.inp> 2a.out
+uvspec <2b.inp> 2b.out
+
+2a.out contains: wavelength, direct horizontal irradiance, diffuse downward horizontal irradiance,diffuse upward horizontal irradiance (reflected), uavg
+uavg: proportional to actinic flux (the radiation that a shpere receives). 
+actinic flux = uavg * 4* pi
+global irradiance on a horizontal surface (looking upwards, like a pyranometer) = direct + diffuse downward
+
+2b.out contains: wavelength, direct horizontal irradiance, diffuse downward horizontal irradiance,diffuse upward horizontal irradiance (reflected), uavgdirect, 
+uavgdiffuse downward,uavgdiffuse upward 
+actinic flux = (uavgdirect + uavgdiffuse downward)  * 4* pi
+global irradiance on a horizontal surface (looking upwards, like a pyranometer) = direct + diffuse downward
+
+
+
+Homework: 
+run the model for sza=10, 30, 40, 60, 80, 85 degrees. 
+Use the following radiative transfer schemes: twostr, sdisort (4 streams), sdisort (8 streams), sdisort (16 streams)
+calculate global irradiance and actinic flux.
+Use sdisort (16 streams) as the reference. Calculate the percentage difference of the other schemes relatively to the reference for all wavelengths.
+Make a figure of the percentage differences as a function of wavelength. Each figure should refer to one solar zenith 
+angle and one radiative quantity (actinic flux or global irradiance) 
+
+Total number of figures: 6 solar zenith angles X 2 radiative quantities =12 . Each figure should include 3 curves (twostr, sdisort4 and sdisort8 differeces 
+relative to sdiort16)
+
+IMPORTANT NOTE: for multiple runs, check file "bat.bat"
