@@ -6,7 +6,7 @@ station = 17220;
 region  = 'europe';
 
 YY = 2024;
-MM = 7 ;
+MM = 2 ;
 
 numDays = eomday(YY, MM);
 
@@ -25,6 +25,10 @@ standTEMP = NaN(numDays, 1);
 LCL = NaN(numDays,1);
 daily_lw = zeros(1, numDays);
 calculatedHeight = NaN(numDays, numLevels);
+lifted_index = zeros(1, numDays);
+k_index = zeros(1, numDays);
+total_totals_index = zeros(1, numDays);
+sweat_index = zeros(1, numDays);
 
 for DD = 1:numDays
     HH = 0;
@@ -64,6 +68,68 @@ for DD = 1:numDays
             end
         else
             daily_lw(DD) = 0; % If target string not found, set to zero
+        end
+
+
+        % Calculate indexes for task 3
+        liftedString = "Lifted index:";
+        idx1 = strfind(fileContent, liftedString);
+
+        kString = "K index:";
+        idx2 = strfind(fileContent, kString);
+
+        totalsString = "Totals totals index:";
+        idx3 = strfind(fileContent, totalsString);
+
+        sweatString = "SWEAT index:";
+        idx4 = strfind(fileContent, sweatString);
+        
+        if ~isempty(idx1)
+            liftedStr = regexp(fileContent(idx1:end), ':\s*([\d.]+)', 'tokens', 'once');
+            if ~isempty(liftedStr)
+                lifted_index(DD) = str2double(liftedStr{1});
+            else
+                lifted_index(DD) = 0; 
+            end
+        else
+            lifted_index(DD) = 0;
+        end
+
+        if ~isempty(idx2)
+            kStr = regexp(fileContent(idx2:end), ':\s*([\d.]+)', 'tokens', 'once');
+            
+            if ~isempty(kStr)
+                k_index(DD) = str2double(kStr{1});
+            else
+                k_index(DD) = 0; 
+            end
+        else
+            k_index(DD) = 0; 
+        end
+
+        if ~isempty(idx3)
+            totalsStr = regexp(fileContent(idx3:end), ':\s*([\d.]+)', 'tokens', 'once');
+
+            if ~isempty(totalsStr)
+                total_totals_index(DD) = str2double(totalsStr{1});
+            else
+                total_totals_index(DD) = 0; 
+            end
+        else
+            total_totals_index(DD) = 0; 
+        end
+
+
+        if ~isempty(idx4)
+            sweatStr = regexp(fileContent(idx4:end), ':\s*([\d.]+)', 'tokens', 'once');
+            
+            if ~isempty(sweatStr)
+                sweat_index(DD) = str2double(sweatStr{1});
+            else
+                sweat_index(DD) = 0; 
+            end
+        else
+            sweat_index(DD) = 0; 
         end
 
         
@@ -131,7 +197,7 @@ end
 %     grid on;
 %     xlabel('Day of Month');
 %     ylabel('Temperature (°C)');
-%     title(sprintf('Timeseries: Temperature at %.0f hPa', pressureLevel));
+%     title(sprintf('Temperature at %.0f hPa', pressureLevel));
 %     legend('Location','Best')
 %     set(gca, 'FontSize', 12);
 % 
@@ -143,7 +209,7 @@ end
 %     grid on;
 %     xlabel('Day of Month');
 %     ylabel('Height (km)');
-%     title(sprintf('Timeseries: Height at %.0f hPa', pressureLevel));
+%     title(sprintf('Height at %.0f hPa', pressureLevel));
 %     set(gca, 'FontSize', 12);
 % 
 %     % Subplot 3: Wind Speed
@@ -152,7 +218,7 @@ end
 %     grid on;
 %     xlabel('Day of Month');
 %     ylabel('Wind Speed (m/s)');
-%     title(sprintf('Timeseries: Wind Speed at %.0f hPa', pressureLevel));
+%     title(sprintf('Wind Speed at %.0f hPa', pressureLevel));
 %     set(gca, 'FontSize', 12);
 % 
 %     % Subplot 4: Relative Humidity
@@ -161,7 +227,7 @@ end
 %     grid on;
 %     xlabel('Day of Month');
 %     ylabel('Relative Humidity (%)');
-%     title(sprintf('Timeseries: Relative Humidity at %.0f hPa', pressureLevel));
+%     title(sprintf('Relative Humidity at %.0f hPa', pressureLevel));
 %     set(gca, 'FontSize', 12);
 % 
 %         % Add Thickness subplot after the 500 hPa figure
@@ -220,74 +286,107 @@ end
 
 %% TASK 1c - Timeseries : LCL, pricipitable water, reversal zone,saturation zone
  
-%Plot daily LCL
-figure('Position', [100, 100, 800, 600]);
+% % Subplot 1: Daily LCL Plot
+% figure;
+% plot(1:numDays, LCL, 'o-', 'LineWidth', 1.5);
+% grid on;
+% xlabel('Day of Month');
+% ylabel('LCL (m)');
+% title('Daily Lifting Condensation Level (LCL)');
+% set(gca, 'FontSize', 12);
+% 
+% % Plot the daily precipitation water
+% figure;
+% plot(1:numDays, daily_lw, '-o', 'LineWidth', 1.5, 'MarkerSize', 6);
+% grid on;
+% xlabel('Day of the Month');
+% ylabel('Precipitable Water (mm)');
+% title('Daily Precipitable Water for the Month');
+% set(gca, 'FontSize', 12);
+% 
+% 
+% % Reversal zones -> where the lapse rate increases with height
+% lapseRate = NaN(numDays, numLevels - 1);  
+% increasingLapseLayerHeight = NaN(numDays, 1); 
+% 
+% 
+% for DD = 1:numDays
+%     % Calculate lapse rate for each consecutive pair of levels
+%     for ii = 1:numLevels - 1
+%         dT = dailyTEMP(DD, ii) - dailyTEMP(DD, ii+1);  % Temperature difference (°C)
+%         dZ = dailyHGHT(DD, ii) - dailyHGHT(DD, ii+1);  % Height difference (km)
+%         lapseRate(DD, ii) = dT / dZ;
+%     end
+% 
+%    for ii = 1:numLevels - 2
+%         if lapseRate(DD, ii+1) > lapseRate(DD, ii)  
+%             increasingLapseLayerHeight(DD) = dailyHGHT(DD, ii+1); 
+%             break; 
+%         end
+%     end
+% end
+% 
+% figure;
+% plot(1:numDays, increasingLapseLayerHeight, 'o-', 'LineWidth', 1.5);
+% grid on;
+% xlabel('Day of the Month');
+% ylabel('Layer Height (km)');
+% title('Reversal Zones');
+% set(gca, 'FontSize', 12);
+% 
+% 
+% % Saturation zones
+% RHUM100LayerHeight = NaN(numDays, 1);  
+% 
+% for DD = 1:numDays
+%     for ii = 1:numLevels
+%         if dailyRHUM(DD, ii) == 100  
+%             RHUM100LayerHeight(DD) = dailyHGHT(DD, ii);  
+%             break;  
+%         end
+%     end
+% end
+% 
+% figure;
+% bar(1:numDays, RHUM100LayerHeight, 'FaceColor', 'b');
+% grid on;
+% xlabel('Day of the Month');
+% ylabel('Layer Height (km)');
+% title('Saturation zones');
+% set(gca, 'FontSize', 12);
 
-% Subplot 1: Daily LCL Plot
-subplot(2,2,1);
-plot(1:numDays, LCL, 'o-', 'LineWidth', 1.5);
-grid on;
-xlabel('Day of Month');
-ylabel('LCL (m)');
-title('Daily Lifting Condensation Level (LCL)');
-set(gca, 'FontSize', 12);
+%% TASK 3 : Lifted index, K-index, Total totals index, SWEAT index
 
-% Plot the daily precipitation water
-subplot(2,1,2);
-plot(1:numDays, daily_lw, '-o', 'LineWidth', 1.5, 'MarkerSize', 6);
+% Plot the daily indexes
+figure;
+subplot(2,2,1)
+plot(1:numDays, lifted_index, '-o', 'LineWidth', 1.5, 'MarkerSize', 6);
 grid on;
 xlabel('Day of the Month');
-ylabel('Precipitable Water (mm)');
-title('Daily Precipitable Water for the Month');
+ylabel('Lifted Index');
+title('Lifted Index for the Month');
 set(gca, 'FontSize', 12);
 
-
-% Reversal zones -> where the lapse rate increases with height
-lapseRate = NaN(numDays, numLevels - 1);  
-increasingLapseLayerHeight = NaN(numDays, 1); 
-
-
-for DD = 1:numDays
-    % Calculate lapse rate for each consecutive pair of levels
-    for ii = 1:numLevels - 1
-        dT = dailyTEMP(DD, ii) - dailyTEMP(DD, ii+1);  % Temperature difference (°C)
-        dZ = dailyHGHT(DD, ii) - dailyHGHT(DD, ii+1);  % Height difference (km)
-        lapseRate(DD, ii) = dT / dZ;
-    end
-
-   for ii = 1:numLevels - 2
-        if lapseRate(DD, ii+1) > lapseRate(DD, ii)  
-            increasingLapseLayerHeight(DD) = dailyHGHT(DD, ii+1); 
-            break; 
-        end
-    end
-end
-
-subplot(2,2,3);
-plot(1:numDays, increasingLapseLayerHeight, 'o-', 'LineWidth', 1.5);
+subplot(2,2,2)
+plot(1:numDays, k_index, '-o', 'LineWidth', 1.5, 'MarkerSize', 6);
 grid on;
 xlabel('Day of the Month');
-ylabel('Layer Height (km)');
-title('Reversal Zones');
+ylabel('K Index');
+title('K Index for the Month');
 set(gca, 'FontSize', 12);
 
-
-% Saturation zones
-RHUM100LayerHeight = NaN(numDays, 1);  
-
-for DD = 1:numDays
-    for ii = 1:numLevels
-        if dailyRHUM(DD, ii) == 100  
-            RHUM100LayerHeight(DD) = dailyHGHT(DD, ii);  
-            break;  
-        end
-    end
-end
-
-subplot(2,2,4);
-bar(1:numDays, RHUM100LayerHeight, 'FaceColor', 'b');
+subplot(2,2,3)
+plot(1:numDays, total_totals_index, '-o', 'LineWidth', 1.5, 'MarkerSize', 6);
 grid on;
 xlabel('Day of the Month');
-ylabel('Layer Height (km)');
-title('Saturation zones');
+ylabel('Total totals Index');
+title('Total totals Index for the Month');
+set(gca, 'FontSize', 12);
+
+subplot(2,2,4)
+plot(1:numDays, sweat_index, '-o', 'LineWidth', 1.5, 'MarkerSize', 6);
+grid on;
+xlabel('Day of the Month');
+ylabel('SWEAT Index');
+title('SWEAT Index for the Month');
 set(gca, 'FontSize', 12);
