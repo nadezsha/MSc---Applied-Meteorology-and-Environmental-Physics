@@ -1,0 +1,28 @@
+how to run the model : 
+uvspec <3.inp> 3.out
+
+3.out contains: wavelength, direct horizontal irradiance, diffuse downward horizontal irradiance,diffuse upward horizontal irradiance (reflected), uavgdirect, 
+uavgdiffuse downward,uavgdiffuse upward 
+
+actinic flux direct = uavgdirect  * 4* pi
+actinic flux diffuse downward =  uavgdiffuse downward  * 4* pi
+actinic flux diffuse upward =  uavgdiffuse upward  * 4* pi
+
+global irradiance on a horizontal surface (looking upwards, like a pyranometer) = direct + diffuse downward
+
+actinic flux on a semispherical surface looking upwards = actinic flux direct + acinic flux diffuse downward
+
+Albedo files: grass, cdry (conrete dry), sand, sno2 (snow 2 cm)
+
+
+
+Homework: 
+run the model for sza=10, 40, 70 degrees. 
+
+Use grass as the reference. Calculate the percentage difference of the other schemes relatively to the reference for all wavelengths.
+Make a figure of the percentage differences as a function of wavelength. Each figure should refer to one solar zenith 
+angle and one radiative quantity (global irradiance, diffuse upward horizontal irradiance, actinic flux on a semispherical surface, actinic flux diffuse upward) 
+
+Total number of figures: 3 solar zenith angles X 4 radiative quantities =12 . Each figure should include 3 curves (cdry, sand, sno2 relatively to grass)
+
+IMPORTANT NOTE: for multiple runs, check file "bat.bat"
