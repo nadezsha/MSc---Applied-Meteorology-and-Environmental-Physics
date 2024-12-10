@@ -1,0 +1,9 @@
+atmosphere_file ../data/atmmod/afglus.dat
+source solar ../data/solar_flux/kurudz_1.0nm.dat
+sza 10.0
+wavelength 290.0 800.0
+spline 300 800 10
+mol_abs_param sbdart
+rte_solver sdisort
+number_of_streams 4 
+albedo_file ../data/albedo/sno2.dat
