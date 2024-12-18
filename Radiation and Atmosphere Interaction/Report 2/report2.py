@@ -101,10 +101,10 @@ for i in range(0,6):
 	sixteen_str[i]["diffused_4_16"] = (four_str[i]['Diffuse_Down'] - sixteen_str[i]['Diffuse_Down'])/sixteen_str[i]['Diffuse_Down'] *100
 	sixteen_str[i]["diffused_8_16"] = (eight_str[i]['Diffuse_Down'] - sixteen_str[i]['Diffuse_Down'])/sixteen_str[i]['Diffuse_Down'] *100
 
-
+'''
 for i in range(0,6):
 	plt.plot(sixteen_str[i]["Wavelength"], sixteen_str[i]["direct_2_16"], color ='b', label = "2 streams")
-	plt.plot(sixteen_str[i]["Wavelength"], sixteen_str[i]["direct_4_16"], color ='r', label = "4 streams")
+	plt.plot(sixteen_str[i]["Wavelength"], sixteen_str[i]["direct_4_16"], color ='r', label = "4 streams", linewidth = 2.5)
 	plt.plot(sixteen_str[i]["Wavelength"], sixteen_str[i]["direct_8_16"], color ='g', label = "8 streams")
 	plt.xlabel(" Wavelength (nm)")
 	plt.ylabel("'%' differences relative to the reference (16 str)")
@@ -123,14 +123,22 @@ for i in range(0,6):
 	plt.grid()
 	plt.title("diffused irradiance for sza = " +str(sza_list[i])+" degrees")
 	plt.show()
-
-# πινακάκια με αποκλίσεις : 3 στριμς * 4 μεγεθη * 6 ζενιθιες = 72 πινακακια... to be continued...
+'''
+# πινακάκια με αποκλίσεις : 3 streams * 4 μεγεθη * 6 szas = 72 columns... to be continued...
+'''
 for i in range(0,6):
 	ranges = [
-    ("uvb", sixteen_str[i][sixteen_str[i]["Wavelength"] < 315]['diffused_2_16'].mean()),
-    ("uva", sixteen_str[i][(sixteen_str[i]["Wavelength"] >= 315) & (sixteen_str[i]["Wavelength"] < 400)]['diffused_2_16'].mean()),
-    ("vis", sixteen_str[i][(sixteen_str[i]["Wavelength"] >= 400) & (sixteen_str[i]["Wavelength"] < 800)]['diffused_2_16'].mean()),
-    ("ir", sixteen_str[i][sixteen_str[i]["Wavelength"] >= 800]['diffused_2_16'].mean()),
+    ("uvb", sixteen_str[i][sixteen_str[i]["Wavelength"] < 315]['Global_2_16'].mean()),
+    ("uva", sixteen_str[i][(sixteen_str[i]["Wavelength"] >= 315) & (sixteen_str[i]["Wavelength"] < 400)]['Global_2_16'].mean()),
+    ("vis", sixteen_str[i][(sixteen_str[i]["Wavelength"] >= 400) & (sixteen_str[i]["Wavelength"] < 800)]['Global_2_16'].mean()),
+    ("ir", sixteen_str[i][sixteen_str[i]["Wavelength"] >= 800]['Global_2_16'].mean()),
 	]
 	result = pd.DataFrame(ranges)
 	print(result)
+
+for i in range (0,6):
+	uvb = sixteen_str[i][sixteen_str[i]["Wavelength"] < 315]['diffused_8_16'].mean().round(2)
+	uva = sixteen_str[i][(sixteen_str[i]["Wavelength"] >= 315) & (sixteen_str[i]["Wavelength"] < 400)]['diffused_8_16'].mean().round(2)
+	vis = sixteen_str[i][(sixteen_str[i]["Wavelength"] >= 400) & (sixteen_str[i]["Wavelength"] < 800)]['diffused_8_16'].mean().round(2)
+	ir = sixteen_str[i][sixteen_str[i]["Wavelength"] >= 800]['diffused_8_16'].mean().round(2)
+'''
