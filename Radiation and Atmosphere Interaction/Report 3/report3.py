@@ -125,3 +125,60 @@ for i in range(0,3):
 	plt.grid()
 	plt.title("actinic flux diffuse upward for sza = " +str(sza_list[i])+" degrees")
 	plt.show()
+
+
+# calculate mean albedos and plot with wavelength for all surfaces
+names = ['wavelength', 'albedo']
+gras = pd.read_csv('gras.dat',delimiter=r"\s+", skiprows=6, names = names)
+cdry = pd.read_csv('cdry.dat',delimiter=r"\s+", skiprows=6, names = names)
+sand = pd.read_csv('sand.dat',delimiter=r"\s+", skiprows=6, names = names)
+sno2 = pd.read_csv('sno2.dat',delimiter=r"\s+", skiprows=6, names = names)
+gras.head()
+
+print("the mean albedo values for the grass, cdry, sand and sno2 are:")
+print(gras['albedo'].mean().round(2), cdry['albedo'].mean().round(2), sand['albedo'].mean().round(2), sno2['albedo'].mean().round(2))
+
+plt.plot(gras['wavelength'], gras['albedo'], label = 'gras', color = 'g')
+plt.plot(cdry['wavelength'], cdry['albedo'], label = 'cdry', color = 'r')
+plt.plot(sand['wavelength'], sand['albedo'], label = 'sand' , color = 'orange')
+plt.plot(sno2['wavelength'], sno2['albedo'], label = 'sno2', color = 'b')
+plt.xlabel("wavelength (nm)")
+plt.ylabel("albedo")
+plt.grid()
+plt.legend(loc = 'best')
+plt.title("albedo values for the ")
+plt.show()
+
+
+# plots for the direct and diffused irradiances
+for i in range(0,3):
+    grass[i]["direct_g_cdr"] = (cdry[i]['direct horizontal irradiance'] - grass[i]['direct horizontal irradiance'])/grass[i]['direct horizontal irradiance'] *100
+    grass[i]["direct_g_snd"] = (sand[i]['direct horizontal irradiance'] - grass[i]['direct horizontal irradiance'])/grass[i]['direct horizontal irradiance'] *100
+    grass[i]["direct_g_sno"] = (sno2[i]['direct horizontal irradiance'] - grass[i]['direct horizontal irradiance'])/grass[i]['direct horizontal irradiance'] *100
+	
+    grass[i]["diffused_g_cdr"] = (cdry[i]['diffuse downward horizontal irradiance'] - grass[i]['diffuse downward horizontal irradiance'])/grass[i]['diffuse downward horizontal irradiance'] *100
+    grass[i]["diffused_g_snd"] = (sand[i]['diffuse downward horizontal irradiance'] - grass[i]['diffuse downward horizontal irradiance'])/grass[i]['diffuse downward horizontal irradiance'] *100
+    grass[i]["diffused_g_sno"] = (sno2[i]['diffuse downward horizontal irradiance'] - grass[i]['diffuse downward horizontal irradiance'])/grass[i]['diffuse downward horizontal irradiance'] *100
+
+
+for i in range(0,3):
+	plt.plot(grass[i]["wavelength"], grass[i]["direct_g_cdr"], color ='r', label = "cdry")
+	plt.plot(grass[i]["wavelength"], grass[i]["direct_g_snd"], color ='g', label = "snd")
+	plt.plot(grass[i]["wavelength"], grass[i]["direct_g_sno"], color ='b', label = "sno2")
+	plt.xlabel(" Wavelength (nm)")
+	plt.ylabel("% differences relative to the reference (grass)")
+	plt.legend()
+	plt.grid()
+	plt.title("direct irradiance for sza = "+str(sza_list[i])+" degrees")
+	plt.show()
+
+for i in range(0,3):
+	plt.plot(grass[i]["wavelength"], grass[i]["diffused_g_cdr"], color ='r', label = "cdry")
+	plt.plot(grass[i]["wavelength"], grass[i]["diffused_g_snd"], color ='g', label = "snd")
+	plt.plot(grass[i]["wavelength"], grass[i]["diffused_g_sno"], color ='b', label = "sno2")
+	plt.xlabel(" Wavelength (nm)")
+	plt.ylabel("% differences relative to the reference (grass)")
+	plt.legend()
+	plt.grid()
+	plt.title("diffused irradiance for sza = "+str(sza_list[i])+" degrees")
+	plt.show()
