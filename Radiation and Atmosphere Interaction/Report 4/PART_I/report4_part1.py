@@ -145,6 +145,7 @@ for sza_list, sza_title in zip(sza_data, sza_titles):
         ax.set_xlabel('Wavelength (nm)')
         ax.set_ylabel('Irradiance Ratio')
         ax.legend(loc='upper left', title="Radiative Quantities")
+        ax.grid(True)
 
         # Adjust layout to ensure no clipping of labels
         fig.tight_layout()
