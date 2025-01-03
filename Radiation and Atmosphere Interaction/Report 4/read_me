@@ -1,0 +1,98 @@
+how to run the model : 
+uvspec <4.inp> 4.out
+
+4.out contains: wavelength, direct horizontal irradiance, diffuse downward horizontal irradiance,diffuse upward horizontal irradiance (reflected), uavgdirect, 
+uavgdiffuse downward,uavgdiffuse upward 
+
+
+
+
+
+Homework: 
+
+PART 1:
+run the model for sza=10, 40, 70 and 85 degrees. 
+Change Angstrom b from 0 to 1, step 0.2
+Use standard values for all other input parameters.
+
+Use b=0 as a reference. Calculate the ratio of others relative to the reference for all wavelengths.
+Make a figure of the ratios as a function of wavelength. Each figure should refer to one solar zenith 
+angle and the following 3 radiative quantities: direct horizontal irradiance, diffuse downward horizontal irradiance, global horizontal irradiance 
+
+Total number of figures: 4 solar zenith angles X 6 Angstrom b values = 24. 
+Each figure should include 3 curves (rhe radiave quantities)
+
+IMPORTANT NOTE: for multiple runs, check file "bat.bat"
+
+
+PART 2:
+run the model for sza=10, 40, 70 and 85 degrees. 
+Change ssa from 0.65 to 0.95 step 0.1
+Use standard values for all other input parameters.
+
+Use ssa = 0.95 as a reference. Calculate the ratio of others relative to the reference for all wavelengths.
+Make a figure of the ratios as a function of wavelength. Each figure should refer to one solar zenith 
+angle and the following 3 radiative quantities: direct horizontal irradiance, diffuse downward horizontal irradiance, global horizontal irradiance 
+
+Total number of figures: 4 solar zenith angles X 4 ssa values = 16. 
+Each figure should include 3 curves (rhe radiave quantities)
+
+IMPORTANT NOTE: for multiple runs, check file "bat.bat"
+
+
+PART 3:
+run the model for sza=10, 40, 70 and 85 degrees. 
+Change gg from 0.5 to 0.9 step 0.2
+Use standard values for all other input parameters.
+
+Use gg = 0.7 as a reference. Calculate the ratio of others relative to the reference for all wavelengths.
+Make a figure of the ratios as a function of wavelength. Each figure should refer to one solar zenith 
+angle and the following 3 radiative quantities: direct horizontal irradiance, diffuse downward horizontal irradiance, global horizontal irradiance 
+
+Total number of figures: 4 solar zenith angles X 3 gg values = 12. 
+Each figure should include 3 curves (rhe radiave quantities)
+
+IMPORTANT NOTE: for multiple runs, check file "bat.bat"
+
+
+
+
+PART 4:
+
+Run set 1: 
+Set spline 300 300 10
+run the model for sza=10, 40, 70 and 85 degrees. 
+Change ssa from 0.65 to 0.95 step 0.1
+Change Angstrom b from 0 to 1, step 0.2
+
+
+
+Run set 2: 
+Set spline 900 900 10
+run the model for sza=10, 40, 70 and 85 degrees. 
+Change ssa from 0.65 to 0.95 step 0.1
+Change Angstrom b from 0 to 1, step 0.2
+
+
+FOR ALL RUN SETS:
+
+Use standard values for all other input parameters.
+
+
+For each solar zenith angle and for each ssa value, calculate the ratios:  
+direct horizontal irradiance / diffuse downward horizontal irradiance 
+direct horizontal irradiance / global horizontal irradiance
+diffuse downward horizontal irradiance/ global horizontal irradiance
+
+among the different Angstrom b values. Use b=0 as a reference
+
+
+Make a figure of the ratios as a function of ssa. Each figure should refer to one solar zenith 
+angle and one irradiance ratio for all b values 
+
+Total number of figures: ~ 1.000.000  :)
+
+IMPORTANT NOTE: for multiple runs, check file "bat.bat"
+
+
+
