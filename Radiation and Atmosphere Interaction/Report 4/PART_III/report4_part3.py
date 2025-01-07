@@ -44,24 +44,24 @@ for i in range(0,3):
 	eighty_five_sza[i]['global'] = eighty_five_sza[i]['direct horizontal irradiance'] + eighty_five_sza[i]['diffuse downward horizontal irradiance']
 
 # calculate ratios relative to gg 0.90 for each gg 
-index_0_90 = gg_list.index('0.90')
+index_0_70 = gg_list.index('0.70')
 
-ten_ref_direct = ten_sza[index_0_90]['direct horizontal irradiance']
-forty_ref_direct = forty_sza[index_0_90]['direct horizontal irradiance']
-seventy_ref_direct = seventy_sza[index_0_90]['direct horizontal irradiance']
-eighty_five_ref_direct = eighty_five_sza[index_0_90]['direct horizontal irradiance']
+ten_ref_direct = ten_sza[index_0_70]['direct horizontal irradiance']
+forty_ref_direct = forty_sza[index_0_70]['direct horizontal irradiance']
+seventy_ref_direct = seventy_sza[index_0_70]['direct horizontal irradiance']
+eighty_five_ref_direct = eighty_five_sza[index_0_70]['direct horizontal irradiance']
 
-ten_ref_diffuse = ten_sza[index_0_90]['diffuse downward horizontal irradiance']
-forty_ref_diffuse = forty_sza[index_0_90]['diffuse downward horizontal irradiance']
-seventy_ref_diffuse = seventy_sza[index_0_90]['diffuse downward horizontal irradiance']
-eighty_five_ref_diffuse = eighty_five_sza[index_0_90]['diffuse downward horizontal irradiance']
+ten_ref_diffuse = ten_sza[index_0_70]['diffuse downward horizontal irradiance']
+forty_ref_diffuse = forty_sza[index_0_70]['diffuse downward horizontal irradiance']
+seventy_ref_diffuse = seventy_sza[index_0_70]['diffuse downward horizontal irradiance']
+eighty_five_ref_diffuse = eighty_five_sza[index_0_70]['diffuse downward horizontal irradiance']
 
-ten_ref_global = ten_sza[index_0_90]['global']
-forty_ref_global = forty_sza[index_0_90]['global']
-seventy_ref_global = seventy_sza[index_0_90]['global']
-eighty_five_ref_global = eighty_five_sza[index_0_90]['global']
+ten_ref_global = ten_sza[index_0_70]['global']
+forty_ref_global = forty_sza[index_0_70]['global']
+seventy_ref_global = seventy_sza[index_0_70]['global']
+eighty_five_ref_global = eighty_five_sza[index_0_70]['global']
 
-# calculate the ratios for direct, diffuse downward and global irradiance relative to gg 0.90
+# calculate the ratios for direct, diffuse downward and global irradiance relative to gg 0.70
 for i in range(0, 3):
     # Direct irradiance ratio
     ten_sza[i]['direct_ratio'] = ten_sza[i]['direct horizontal irradiance'] / ten_ref_direct
