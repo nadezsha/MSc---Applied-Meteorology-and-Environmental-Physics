@@ -9,10 +9,11 @@ exceed 2°C/km.
 import pandas as pd
 
 # import data (only kept the temp and hght for the dataframe)
-df = pd.read_csv("LGAT12Z2712.txt", sep='\s+', usecols =['HGHT', 'TEMP'])
-#print(df.head())
+df = pd.read_csv("16622_3012_00Z.txt", sep='\s+', usecols =['HGHT', 'TEMP'])
+print(df.head())
 
-# calculate the temp and hght differences usind .diff() and then calculate the laspe rate for each row
+# calculate the temp and hght differences usind .diff() and then calculate the laspe rate for each row 
+# for the lapse rate we multiply by 1000 in order to get °C/km instead of °C/m
 df['dT (°C)'] = df['TEMP'].diff()
 df['dZ (m)'] = df['HGHT'].diff()
 df['Lapse Rate (°C/km)'] = df['dT (°C)'] / df['dZ (m)'] * 1000
@@ -21,6 +22,7 @@ df['Lapse Rate (°C/km)'] = df['dT (°C)'] / df['dZ (m)'] * 1000
 df = df.dropna().reset_index(drop=True)
 
 # define function that finds the lowest level where the lapse rate decreases to 2°C/km or less
+# for this part, the abs value of the lapse rate was used (reduses sign-related errors)
 def find_lowest_height(df, max_lapse_rate=2.0, upper_layer=2000):
     for i in range(len(df)):
         if abs(df.loc[i, 'Lapse Rate (°C/km)']) <= max_lapse_rate:
