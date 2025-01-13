@@ -1,0 +1,24 @@
+atmosphere_file ../data/atmmod/afglus.dat
+source solar ../data/solar_flux/kurudz_1.0nm.dat
+aerosol_default 
+mol_abs_param sbdart
+sza 70
+phi0 0                                        #Azimuth angle of the sun
+number_of_streams 16
+
+wavelength 300 1100
+spline 550 550 10
+rte_solver disort
+
+aerosol_angstrom 1.0 0.1                      #Angstrom alpha and beta coefficients
+aerosol_modify ssa scale 0.95                 #Single scattering albedo
+aerosol_modify gg set 0.70                    #Asymmetry factor
+
+mol_modify H2O 37 MM                          #precipitable water 
+
+#Cosine of output polar angles in increasing order (0-85 degrees with 5 step), starting with negative (downwelling radiance, looking upward) values
+umu -1.0 -0.996 -0.985 -0.966 -0.94 -0.906 -0.866 -0.819 -0.766 -0.707 -0.643 -0.574 -0.5 -0.423 -0.342 -0.259 -0.174 
+
+#Azimuth output angles (in degrees) in increasing order.
+phi 0.0 10.0 20.0 30.0 40.0 50.0 60.0 70.0 80.0 90.0 100.0 110.0 120.0 130.0 140.0 150.0 160.0 170.0 180.0 
+quiet
