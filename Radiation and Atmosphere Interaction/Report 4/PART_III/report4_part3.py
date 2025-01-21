@@ -117,3 +117,43 @@ for i, sza_angle in enumerate([10, 40, 70, 85]):
             plot_and_save_irradiance_ratios(seventy_sza, sza_angle, gg, j)
         elif sza_angle == 85:
             plot_and_save_irradiance_ratios(eighty_five_sza, sza_angle, gg, j)
+
+# Combined Plot for Each SZA Angle
+def combined_plot_for_sza(sza_data, sza_angle, gg_list):
+    plt.figure(figsize=(12, 8))
+
+    # Loop over GG list to plot the data
+    for j, gg in enumerate(gg_list):
+        # Plot Direct Irradiance Ratio (blue solid line)
+        plt.plot(sza_data[j]['wavelength'], sza_data[j]['direct_ratio'], label=f'gg={gg} (Direct)', color='blue', linestyle='-', alpha=0.7)
+        
+        # Plot Diffuse Downward Irradiance Ratio (green solid line)
+        plt.plot(sza_data[j]['wavelength'], sza_data[j]['diffuse_ratio'], label=f'gg={gg} (Diffuse)', color='green', linestyle='-', alpha=0.7)
+        
+        # Plot Global Irradiance Ratio (red solid line)
+        plt.plot(sza_data[j]['wavelength'], sza_data[j]['global_ratio'], label=f'gg={gg} (Global)', color='red', linestyle='-', alpha=0.7)
+
+    # Title and Labels
+    plt.title(f'Irradiance Ratios for {sza_angle}° SZA')
+    plt.xlabel('Wavelength (nm)')
+    plt.ylabel('Irradiance Ratio')
+
+    # Display the legend
+    plt.legend(loc='upper right', fontsize=8, bbox_to_anchor=(1.05, 1), borderaxespad=0.)
+    plt.grid(True)
+
+    # Save the combined plot for this SZA angle
+    plt.tight_layout()
+    plt.savefig(f'combined_irradiance_ratios_{sza_angle}deg.png')
+    plt.show()
+
+# Create and save combined plots for each SZA angle
+for i, sza_angle in enumerate([10, 40, 70, 85]):
+    if sza_angle == 10:
+        combined_plot_for_sza(ten_sza, sza_angle, gg_list)
+    elif sza_angle == 40:
+        combined_plot_for_sza(forty_sza, sza_angle, gg_list)
+    elif sza_angle == 70:
+        combined_plot_for_sza(seventy_sza, sza_angle, gg_list)
+    elif sza_angle == 85:
+        combined_plot_for_sza(eighty_five_sza, sza_angle, gg_list)
