@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# read the files
+# Read the files (same code as you provided)
 ten_sza = []
 forty_sza = []
 seventy_sza = []
@@ -20,45 +20,31 @@ col_names = ['wavelength', 'direct horizontal irradiance', 'diffuse downward hor
              'uavgdiffuse upward']
 
 for filename in filename_ten:
-	file = pd.read_csv(filename, delimiter=r"\s+", names=col_names) 
-	ten_sza.append(file) 
+    file = pd.read_csv(filename, delimiter=r"\s+", names=col_names) 
+    ten_sza.append(file) 
 
 for filename in filename_forty:
-	file = pd.read_csv(filename, delimiter=r"\s+", names=col_names) 
-	forty_sza.append(file) 
+    file = pd.read_csv(filename, delimiter=r"\s+", names=col_names) 
+    forty_sza.append(file) 
 
 for filename in filename_seventy:
-	file = pd.read_csv(filename, delimiter=r"\s+", names=col_names) 
-	seventy_sza.append(file) 
+    file = pd.read_csv(filename, delimiter=r"\s+", names=col_names) 
+    seventy_sza.append(file) 
 
 for filename in filename_eighty_five:
-	file = pd.read_csv(filename, delimiter=r"\s+", names=col_names) 
-	eighty_five_sza.append(file)  
-	
-''' Each list contains 6 DataFrames. Every DataFrame contains values for a different b.'''
-#print(ten_sza)
+    file = pd.read_csv(filename, delimiter=r"\s+", names=col_names) 
+    eighty_five_sza.append(file)  
 
-# adding the 'global irradiance' column on all DataFrames
-for i in range(0,6):
-	ten_sza[i]['global'] = ten_sza[i]['direct horizontal irradiance'] + ten_sza[i]['diffuse downward horizontal irradiance']
-	forty_sza[i]['global'] = forty_sza[i]['direct horizontal irradiance'] + forty_sza[i]['diffuse downward horizontal irradiance']
-	seventy_sza[i]['global'] = seventy_sza[i]['direct horizontal irradiance'] + seventy_sza[i]['diffuse downward horizontal irradiance']
-	eighty_five_sza[i]['global'] = eighty_five_sza[i]['direct horizontal irradiance'] + eighty_five_sza[i]['diffuse downward horizontal irradiance']
-	
-# create a function to calculate the ratios for each DataFrame in the list
-def calculate_ratios(reference_df, target_list):
-    reference_global = reference_df['global']  # extract the global irradiance for b = 0.0
-    ratios = []
-    
-    for df in target_list:
-        ratio = df['global'] / reference_global  # calculate the ratio
-        ratios.append(ratio)
-    
-    return ratios
+# Add the 'global irradiance' column
+for i in range(0, 6):
+    ten_sza[i]['global'] = ten_sza[i]['direct horizontal irradiance'] + ten_sza[i]['diffuse downward horizontal irradiance']
+    forty_sza[i]['global'] = forty_sza[i]['direct horizontal irradiance'] + forty_sza[i]['diffuse downward horizontal irradiance']
+    seventy_sza[i]['global'] = seventy_sza[i]['direct horizontal irradiance'] + seventy_sza[i]['diffuse downward horizontal irradiance']
+    eighty_five_sza[i]['global'] = eighty_five_sza[i]['direct horizontal irradiance'] + eighty_five_sza[i]['diffuse downward horizontal irradiance']
 
-# calculate ratios for each list, using the DataFrame with b = 0.0 (index 0)
+# Calculate ratios
 def calculate_ratios(reference_df, target_list):
-    reference_global = reference_df['global'] 
+    reference_global = reference_df['global']
     reference_dhi = reference_df['direct horizontal irradiance']
     reference_diffuse = reference_df['diffuse downward horizontal irradiance']  
     
@@ -66,7 +52,6 @@ def calculate_ratios(reference_df, target_list):
     dhi_ratios = []
     diffuse_ratios = []
 
-    # iterate through each DataFrame in the target list and calculate the ratios
     for df in target_list:
         global_ratio = df['global'] / reference_global
         dhi_ratio = df['direct horizontal irradiance'] / reference_dhi
@@ -78,13 +63,13 @@ def calculate_ratios(reference_df, target_list):
     
     return global_ratios, dhi_ratios, diffuse_ratios
 
-# calculate ratios for each list, using the DataFrame with b=0.0 (index 0)
+# Calculate ratios for each list, using the DataFrame with b=0.0 (index 0)
 ten_sza_global_ratios, ten_sza_dhi_ratios, ten_sza_diffuse_ratios = calculate_ratios(ten_sza[0], ten_sza)
 forty_sza_global_ratios, forty_sza_dhi_ratios, forty_sza_diffuse_ratios = calculate_ratios(forty_sza[0], forty_sza)
 seventy_sza_global_ratios, seventy_sza_dhi_ratios, seventy_sza_diffuse_ratios = calculate_ratios(seventy_sza[0], seventy_sza)
 eighty_five_sza_global_ratios, eighty_five_sza_dhi_ratios, eighty_five_sza_diffuse_ratios = calculate_ratios(eighty_five_sza[0], eighty_five_sza)
 
-# store these ratios in new columns in the DataFrames
+# Store these ratios in new columns in the DataFrames
 for i, ratio in enumerate(ten_sza_global_ratios):
     ten_sza[i]['global_ratio'] = ratio
 for i, ratio in enumerate(ten_sza_dhi_ratios):
@@ -113,45 +98,44 @@ for i, ratio in enumerate(eighty_five_sza_dhi_ratios):
 for i, ratio in enumerate(eighty_five_sza_diffuse_ratios):
     eighty_five_sza[i]['diffuse_ratio'] = ratio
 
-# print the results to check the output
-#for i in range(6):
-#    print(f"Ten SZA - b = {b_list[i]}:\n", ten_sza[i].head())
-
-# define the wavelengths 
+# Define the wavelengths 
 wavelength = ten_sza[0]['wavelength']  
 
-# list of sza data (for different solar zenith angles)
+# List of sza data (for different solar zenith angles)
 sza_data = [ten_sza, forty_sza, seventy_sza, eighty_five_sza]
 sza_titles = ['10° SZA', '40° SZA', '70° SZA', '85° SZA']
 
-# iterate through each sza
+# Define a list of colors (you can change these colors as desired)
+colors = ['b', 'g', 'r', 'c', 'm', 'y']
+
+# List of irradiance types and corresponding columns for ratios
+irradiance_types = ['global', 'direct horizontal irradiance', 'diffuse downward horizontal irradiance']
+irradiance_columns = ['global_ratio', 'dhi_ratio', 'diffuse_ratio']
+
+# Create separate figures for each SZA (10°, 40°, 70°, 85°)
 for sza_list, sza_title in zip(sza_data, sza_titles):
-    # iterate over each b value (b = 0.0, 0.2, 0.4, 0.6, 0.8)
-    for i, b in enumerate(b_list):
-        # create a new plot for each b value
-        fig, ax = plt.subplots(figsize=(10, 6))
-        
-        # extract the ratios for global, direct, and diffused for the given sza and b value
-        global_ratios = sza_list[i]['global_ratio']
-        dhi_ratios = sza_list[i]['dhi_ratio']
-        diffuse_ratios = sza_list[i]['diffuse_ratio']
-        
-        # plot the three radiative quantities for this b value
-        ax.plot(wavelength, global_ratios, label=f'Global Irradiance (b={b})', linestyle='-', color='blue')
-        ax.plot(wavelength, dhi_ratios, label=f'Direct Horizontal Irradiance (b={b})', linestyle='-', color='red')
-        ax.plot(wavelength, diffuse_ratios, label=f'Diffuse Downward Irradiance (b={b})', linestyle='-', color='green')
+    # Create separate figures for each SZA
+    for irradiance_type, column_name in zip(irradiance_types, irradiance_columns):
+        plt.figure(figsize=(12, 8))  # Start a new figure for each SZA and irradiance type
 
-        ax.set_title(f'{sza_title} , b = {b}')
-        ax.set_xlabel('Wavelength (nm)')
-        ax.set_ylabel('Irradiance Ratio')
-        ax.legend(loc='upper left', title="Radiative Quantities")
-        ax.grid(True)
+        for i, b in enumerate(b_list):
+            ratios = sza_list[i][column_name]  # Get the ratios for the selected irradiance type
+            color = colors[i % len(colors)]  # Cycle colors for each b value
 
-        # Adjust layout to ensure no clipping of labels
-        fig.tight_layout()
+            # Plot the selected irradiance ratio for this SZA and b
+            plt.plot(wavelength, ratios, label=f'{irradiance_type.capitalize()} b={b}', color=color, linestyle='-', linewidth=2)
 
-        # Save the plot to a file
-        plt.savefig(f"{sza_title.replace('°', '').replace(' ', '_')}_b_{b}.png")
+        # Set plot labels and title
+        plt.title(f"{irradiance_type.capitalize()} Ratios for {sza_title}")
+        plt.xlabel('Wavelength (nm)')
+        plt.ylabel('Irradiance Ratio')
 
-        # Display the plot 
-        # plt.show()
+        # Display the legend inside the plot area at the upper right with smaller font size
+        plt.legend(loc='upper left', title="Radiative Quantities", fontsize=6, bbox_to_anchor=(1.05, 1), borderaxespad=0.)
+
+        # Make sure the plot has tight layout
+        plt.tight_layout()
+
+        # Save the figure as a PNG file
+        plt.savefig(f"{sza_title}_{irradiance_type}_values.png")
+        plt.show()  # Show the plot for each SZA and irradiance type
