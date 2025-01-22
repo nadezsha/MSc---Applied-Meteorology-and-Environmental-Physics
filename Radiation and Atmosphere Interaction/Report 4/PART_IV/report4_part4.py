@@ -131,7 +131,7 @@ fig.colorbar(scatter3, ax=ax3, label='Ratio')  # Add color bar for ratio values
 
 # Save the figure
 plt.tight_layout()
-plt.savefig("irradiance_ratios_3d_scatter_plots.png", dpi=300)  
+plt.savefig("irradiance_ratios_3d_scatter_plots2.png", dpi=300)  
 
 # Show the plots
 plt.show()
