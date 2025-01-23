@@ -104,7 +104,7 @@ fig = plt.figure(figsize=(18, 6))
 
 # Ratio of direct horizontal irradiance / diffuse downward horizontal irradiance
 ax1 = fig.add_subplot(131, projection='3d')
-scatter1 = ax1.scatter(combined_df['angstrom'], combined_df['ssa'], combined_df['sza'], c=ratio_direct_diffuse, cmap='viridis', marker='o', vmin=ratio_min, vmax=ratio_max)
+scatter1 = ax1.scatter(combined_df['angstrom'], combined_df['ssa'], combined_df['sza'], c=ratio_direct_diffuse, cmap='jet', marker='o', vmin=ratio_min, vmax=ratio_max)
 ax1.set_title('Direct / Diffuse Horizontal Irradiance')
 ax1.set_xlabel('Angstrom')
 ax1.set_ylabel('SSA')
@@ -113,7 +113,7 @@ fig.colorbar(scatter1, ax=ax1, label='Ratio')  # Add color bar for ratio values
 
 # Ratio of direct horizontal irradiance / global horizontal irradiance
 ax2 = fig.add_subplot(132, projection='3d')
-scatter2 = ax2.scatter(combined_df['angstrom'], combined_df['ssa'], combined_df['sza'], c=ratio_direct_global, cmap='viridis', marker='o', vmin=ratio_min, vmax=ratio_max)
+scatter2 = ax2.scatter(combined_df['angstrom'], combined_df['ssa'], combined_df['sza'], c=ratio_direct_global, cmap='jet', marker='o', vmin=ratio_min, vmax=ratio_max)
 ax2.set_title('Direct / Global Horizontal Irradiance')
 ax2.set_xlabel('Angstrom')
 ax2.set_ylabel('SSA')
@@ -122,7 +122,7 @@ fig.colorbar(scatter2, ax=ax2, label='Ratio')  # Add color bar for ratio values
 
 # Ratio of diffuse downward horizontal irradiance / global horizontal irradiance
 ax3 = fig.add_subplot(133, projection='3d')
-scatter3 = ax3.scatter(combined_df['angstrom'], combined_df['ssa'], combined_df['sza'], c=ratio_diffuse_global, cmap='viridis', marker='o', vmin=ratio_min, vmax=ratio_max)
+scatter3 = ax3.scatter(combined_df['angstrom'], combined_df['ssa'], combined_df['sza'], c=ratio_diffuse_global, cmap='jet', marker='o', vmin=ratio_min, vmax=ratio_max)
 ax3.set_title('Diffuse / Global Horizontal Irradiance')
 ax3.set_xlabel('Angstrom')
 ax3.set_ylabel('SSA')
@@ -131,7 +131,7 @@ fig.colorbar(scatter3, ax=ax3, label='Ratio')  # Add color bar for ratio values
 
 # Save the figure
 plt.tight_layout()
-plt.savefig("irradiance_ratios_3d_scatter_plots2.png", dpi=300)  
+plt.savefig("irradiance_ratios_3d_scatter_plots.png", dpi=300)  
 
 # Show the plots
 plt.show()
