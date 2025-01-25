@@ -11,5 +11,5 @@ aerosol_default
 aerosol_angstrom 1.5 0.1
 aerosol_modify ssa scale 0.95
 aerosol_modify gg set 0.70
-wc_file 1D C:/cygwin64/home/stavros/libRadtran-2.0.1/ergasia5/WC5.DAT
+wc_file 1D ./WC5.DAT
 wc_modify tau set 20.0
