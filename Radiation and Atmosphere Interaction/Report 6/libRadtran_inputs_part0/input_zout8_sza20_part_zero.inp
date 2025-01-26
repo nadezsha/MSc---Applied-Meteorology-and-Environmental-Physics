@@ -1,0 +1,15 @@
+atmosphere_file ../data/atmmod/afglus.dat
+source solar ../data/solar_flux/kurudz_1.0nm.dat
+sza 20
+wavelength 290.0 1100.0
+spline 300 1100 10
+mol_abs_param sbdart
+rte_solver sdisort
+number_of_streams 4
+aerosol_default
+aerosol_angstrom 1.5 0.1
+aerosol_modify ssa scale 0.95
+aerosol_modify gg set 0.70
+wc_file 1D ./WC6_part2.DAT
+wc_modify tau set 0
+zout 8
