@@ -1,0 +1,50 @@
+import os
+
+# Define your input parameters
+sza_values = [20, 70]
+tau_values = [0, 2, 5]
+
+# Template content for the configuration file
+template_content = """
+                         # Location of atmospheric profile file. 
+atmosphere_file ../data/atmmod/afglus.dat
+                         # Location of the extraterrestrial spectrum
+source solar ../data/solar_flux/kurudz_1.0nm.dat per_nm
+sza 20.0                  # Solar zenith angle
+wavelength 290.0 3100.0   # Wavelength range [nm]
+spline 300 3000 10         # Interpolate from first to last in step
+mol_abs_param SBDART
+rte_solver sdisort        # Radiative transfer equation solver
+number_of_streams 4			# Number of streams
+aerosol_default
+aerosol_angstrom 1.5 0.1 # Scale aerosol optical depth using Angstrom alpha and beta coefficients
+aerosol_modify ssa scale 0.95 # Set the single scattering albedo for all wavelengths
+aerosol_modify gg set 0.70 # Set the asymmetry factor
+
+wc_file 1D C:/cygwin64/home/stavros/libRadtran-2.0.1/ergasia7/WC7.DAT    # Location of water cloud file
+wc_modify tau set 0.              # Set total water cloud optical depth
+zout 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+heating_rate
+output_process per_nm
+output_process integrate
+"""
+
+# Directory to save the new files
+output_dir = "libRadtran_inputs"
+os.makedirs(output_dir, exist_ok=True)
+
+# Loop over all combinations of sza and tau
+for sza in sza_values:
+    for tau in tau_values:
+        # Create file name based on sza and tau
+        file_name = f"config_sza{int(sza)}_tau{int(tau)}.inp" 
+        file_path = os.path.join(output_dir, file_name)
+        
+        # Substitute the sza and tau values into the template content
+        file_content = template_content.format(sza_value=sza, tau_value=tau)
+        
+        # Write the generated content to the file
+        with open(file_path, 'w') as file:
+            file.write(file_content)
+
+        print(f"Generated file: {file_path}")
