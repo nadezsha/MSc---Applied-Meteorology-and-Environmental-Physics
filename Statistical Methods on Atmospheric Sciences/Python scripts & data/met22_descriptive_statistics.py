@@ -195,7 +195,17 @@ plt.show()
 
 # Correlation matrix
 
-corr_matr = df.corr()
+corr_matr = df.corr(method='pearson')
+print(corr_matr)
+sn.heatmap(corr_matr, annot=True)
+plt.show()
+
+corr_matr = df.corr(method='spearman')
+print(corr_matr)
+sn.heatmap(corr_matr, annot=True)
+plt.show()
+
+corr_matr = df.corr(method='kendall')
 print(corr_matr)
 sn.heatmap(corr_matr, annot=True)
 plt.show()
