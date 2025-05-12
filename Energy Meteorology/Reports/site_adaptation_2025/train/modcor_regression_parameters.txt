@@ -1,0 +1,3 @@
+Regression Parameters for ModCor vs Mod
+GHI: a* = 1.068503, b* = -14.374397
+DNI: a* = 1.152686, b* = -14.268841
