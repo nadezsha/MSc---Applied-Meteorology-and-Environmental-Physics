@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import re
 
 # Create figures directory if it doesn't exist
 os.makedirs('figures', exist_ok=True)
@@ -24,7 +25,7 @@ strongdiv_diu['ws [m s-¹]'] = -0.00005 * strongdiv_diu['h [m]']
 
 print(nodiv)
 
-# Plotting function for group comparison
+##### Functions #####
 def plot_group_subsidence(dfs, labels, group_title, height_col='h [m]', velocity_col='ws [m s-¹]'):
     plt.figure(figsize=(6, 6))
     for df, label in zip(dfs, labels):
@@ -44,27 +45,31 @@ def plot_group_subsidence(dfs, labels, group_title, height_col='h [m]', velocity
     plt.show()
 
 def plot_3panel_temporal(dfs, labels, group_title):
+    import matplotlib.pyplot as plt
+    import os
+
     variables = ['θ [K]', 'Δθ [K]', 'h [m]']
     titles = ['Mean Potential Temperature (θ̄)', 'Δθ over Time', 'Boundary Layer Height (h) over Time']
     ylabels = ['θ̄ [K]', 'Δθ [K]', 'h [m]']
 
-    plt.figure(figsize=(18, 5))
-    for i, (var, title, ylabel) in enumerate(zip(variables, titles, ylabels), start=1):
-        plt.subplot(1, 3, i)
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    
+    for ax, var, title, ylabel in zip(axes, variables, titles, ylabels):
         for df, label in zip(dfs, labels):
-            plt.plot(df['time [h]'], df[var], label=label)
-        plt.title(title)
-        plt.xlabel('Time [h]')
-        plt.ylabel(ylabel)
-        plt.legend()
-        plt.grid(True)
+            ax.plot(df['time [h]'], df[var], label=label)
+        ax.set_title(title)
+        ax.set_xlabel('Time [h]')
+        ax.set_ylabel(ylabel)
+        ax.legend()
+        ax.grid(True)
 
-    plt.suptitle(group_title, fontsize=16)
-    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    fig.suptitle(group_title, fontsize=16)
+    fig.tight_layout(rect=[0, 0.03, 1, 0.95])  # Ensure room for suptitle
+
     filename = group_title.replace(" ", "_").lower() + '.png'
-    plt.savefig(os.path.join('figures', filename), dpi=300)
+    fig.savefig(os.path.join('figures', filename), dpi=300)
     plt.show()
-
+    plt.close(fig)  
 
 def compute_dh_dt(df, time_col='time [h]', height_col='h [m]', tol=1):
     """Adds ∂h/∂t column and returns rows where it is ~0."""
@@ -86,9 +91,14 @@ def plot_h_with_zero_growth_all(dfs, labels, title):
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    filename = title.replace(" ", "_").lower() + '.png'
-    plt.savefig(os.path.join('figures', filename), dpi=300)
+
+    # Safe filename generation: remove or replace special characters
+    safe_title = re.sub(r'[^\w\s-]', '', title)  # Remove special characters
+    safe_title = safe_title.replace(' ', '_').lower() + '.png'
+
+    plt.savefig(os.path.join('figures', safe_title), dpi=300)
     plt.show()
+    plt.close()
 
 
 # TASK zero : plot the subsidence velocity as a function of height to find its dependence on height.
@@ -128,12 +138,13 @@ plot_3panel_temporal(
 plot_h_with_zero_growth_all(
     [nodiv_diu, weakdiv_diu, strongdiv_diu],
     ['No Divergence (Diurnal)', 'Weak Divergence (Diurnal)', 'Strong Divergence (Diurnal)'],
-    'Diurnal Cases'
+    'Diurnal Cases – ∂h/∂t ≈ 0'
 )
 
 # Non-diurnal group
 plot_h_with_zero_growth_all(
     [nodiv, weakdiv, strongdiv],
     ['No Divergence', 'Weak Divergence', 'Strong Divergence'],
-    'Non-Diurnal Cases'
+    'Non-Diurnal Cases – ∂h/∂t ≈ 0'
 )
+
