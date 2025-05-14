@@ -7,7 +7,7 @@ from sklearn.metrics import mean_squared_error
 from scipy.stats import pearsonr
 
 # Reading the data file
-data = pd.read_csv('Train_Boulder.txt', sep=" ")
+data = pd.read_csv('Train_Kiruna.txt', sep=" ")
 #print(data)
 
 # Defining percentiles
@@ -46,8 +46,9 @@ def calculate_metrics(mod, obs):
 
     # Pearson correlation coefficient (R)
     r, _ = pearsonr(obs, mod)
+    r2 = r**2
 
-    return mbe, rmse, r
+    return mbe, rmse, r2
 
 
 def interpolation(modper, obsper, mod, radiation_type):
@@ -95,23 +96,23 @@ obsGHI = np.percentile(data['GHIobs'], num)
 modGHI = np.percentile(data['GHImod'], num)
 initial_graph(obsGHI, modGHI, 'GHI')
 mbe_ghi, rmse_ghi, r_ghi = calculate_metrics(data['GHImod'], data['GHIobs'])
-print(f"GHI → MBE: {mbe_ghi:.2f}, RMSE: {rmse_ghi:.2f}, R: {r_ghi:.3f}")
+print(f"GHI → MBE: {mbe_ghi:.2f}, RMSE: {rmse_ghi:.2f}, R²: {r_ghi:.3f}")
 
 obsDNI = np.percentile(data['DNIobs'], num)
 modDNI = np.percentile(data['DNImod'], num)
 initial_graph(obsDNI, modDNI, 'DNI')
 mbe_dni, rmse_dni, r_dni = calculate_metrics(data['DNImod'], data['DNIobs'])
-print(f"DNI → MBE: {mbe_dni:.2f}, RMSE: {rmse_dni:.2f}, R: {r_dni:.3f}")
+print(f"DNI → MBE: {mbe_dni:.2f}, RMSE: {rmse_dni:.2f}, R²: {r_dni:.3f}")
 
 # step 2 : linear interpolation
 print(" ")
 ghi_cor = interpolation(modGHI, obsGHI, data['GHImod'], 'GHI')
 mbe_ghi_new, rmse_ghi_new, r_ghi_new = calculate_metrics(ghi_cor, data['GHIobs'])
-print(f"GHI → MBE new: {mbe_ghi_new:.2f}, RMSE new: {rmse_ghi_new:.2f}, R new: {r_ghi_new:.3f}")
+print(f"GHI → MBE new: {mbe_ghi_new:.2f}, RMSE new: {rmse_ghi_new:.2f}, R² new: {r_ghi_new:.3f}")
 
 dni_cor = interpolation(modDNI, obsDNI, data['DNImod'], 'DNI')
 mbe_dni_new, rmse_dni_new, r_dni_new = calculate_metrics(dni_cor, data['DNIobs'])
-print(f"DNI → MBE new: {mbe_dni_new:.2f}, RMSE new: {rmse_dni_new:.2f}, R new: {r_dni_new:.3f}")
+print(f"DNI → MBE new: {mbe_dni_new:.2f}, RMSE new: {rmse_dni_new:.2f}, R² new: {r_dni_new:.3f}")
 
 # Save percentiles from training (modGHI, obsGHI, etc.)
 np.savez('eqm_mapping_training_data.npz',

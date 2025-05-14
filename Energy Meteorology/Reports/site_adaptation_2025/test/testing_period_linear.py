@@ -88,8 +88,9 @@ def calculate_metrics(mod, obs):
 
     # Pearson correlation coefficient (R)
     r, _ = pearsonr(obs, mod)
+    r2= r**2
 
-    return mbe, rmse, r
+    return mbe, rmse, r2
 
 
 ##### Main Code #####
@@ -97,18 +98,18 @@ def calculate_metrics(mod, obs):
 # step 1
 a_ghi, b_ghi = plot_mod_vs_obs(data['GHImod'], data['GHIobs'], 'GHI')
 mbe_ghi, rmse_ghi, r_ghi = calculate_metrics(data['GHImod'], data['GHIobs'])
-print(f"GHI → MBE: {mbe_ghi:.2f}, RMSE: {rmse_ghi:.2f}, R: {r_ghi:.3f}")
+print(f"GHI → MBE: {mbe_ghi:.2f}, RMSE: {rmse_ghi:.2f}, R²: {r_ghi:.3f}")
 
 a_dni, b_dni = plot_mod_vs_obs(data['DNImod'], data['DNIobs'], 'DNI')
 mbe_dni, rmse_dni, r_dni = calculate_metrics(data['DNImod'], data['DNIobs'])
-print(f"DNI → MBE: {mbe_dni:.2f}, RMSE: {rmse_dni:.2f}, R: {r_dni:.3f}")
+print(f"DNI → MBE: {mbe_dni:.2f}, RMSE: {rmse_dni:.2f}, R²: {r_dni:.3f}")
 
 # step 3
 print(" ")
-a_ghi_new, b_ghi_new = plot_cormod_vs_obs(data['GHImodcor'], data['GHIobs'], 'GHI')
+a_ghi_new, b_ghi_new = plot_cormod_vs_obs(data['GHImodcor'], data['GHIobs'], 'corrected GHI')
 mbe_ghi_new, rmse_ghi_new, r_ghi_new = calculate_metrics(data['GHImodcor'], data['GHIobs'])
-print(f"GHI → MBE new: {mbe_ghi_new:.2f}, RMSE new: {rmse_ghi_new:.2f}, R new: {r_ghi_new:.3f}")
+print(f"GHI → MBE new: {mbe_ghi_new:.2f}, RMSE new: {rmse_ghi_new:.2f}, R² new: {r_ghi_new:.3f}")
 
-a_dni_new, b_dni_new = plot_cormod_vs_obs(data['DNImodcor'], data['DNIobs'], 'DNI')
+a_dni_new, b_dni_new = plot_cormod_vs_obs(data['DNImodcor'], data['DNIobs'], 'corrected DNI')
 mbe_dni_new, rmse_dni_new, r_dni_new = calculate_metrics(data['DNImodcor'], data['DNIobs'])
-print(f"DNI → MBE new: {mbe_dni_new:.2f}, RMSE new: {rmse_dni_new:.2f}, R new: {r_dni_new:.3f}")
+print(f"DNI → MBE new: {mbe_dni_new:.2f}, RMSE new: {rmse_dni_new:.2f}, R² new: {r_dni_new:.3f}")

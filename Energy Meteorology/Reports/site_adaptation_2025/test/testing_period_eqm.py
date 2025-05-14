@@ -18,11 +18,12 @@ def calculate_metrics(mod, obs):
     mbe = np.mean(mod - obs)
     rmse = np.sqrt(mean_squared_error(obs, mod))
     r, _ = pearsonr(obs, mod)
-    return mbe, rmse, r
+    r2 = r**2
+    return mbe, rmse, r2
 
 def report_metrics(label, modeled, observed):
     mbe, rmse, r = calculate_metrics(modeled, observed)
-    print(f"{label} → MBE: {mbe:.2f}, RMSE: {rmse:.2f}, R: {r:.3f}")
+    print(f"{label} → MBE: {mbe:.2f}, RMSE: {rmse:.2f}, R²: {r:.3f}")
     return mbe, rmse, r
 
 def initial_graph(obs, mod, radiation_type):
