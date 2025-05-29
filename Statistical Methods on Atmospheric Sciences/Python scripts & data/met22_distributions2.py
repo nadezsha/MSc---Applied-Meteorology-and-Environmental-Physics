@@ -1,12 +1,12 @@
 import scipy
 import pandas as pd
 import numpy as np
-import seaborn as sns 
 import matplotlib.pyplot as plt
+import seaborn as sns
 import statsmodels.api as sm
 
 # Example 4.1 Calculate the probability of the lake freezing exactly once in 10 years
-scipy.stats.binom.pmf(1, 10, 0.045) # x=1, N=10, p=10/220=0.045
+scipy.stats.binom.pmf(1, 10, 0.045)
 
 # Example 4.2 Calculate the probability of the lake freezing at least once in 10 years
 1-scipy.stats.binom.pmf(0, 10, 0.045)
@@ -14,7 +14,7 @@ scipy.stats.binom.pmf(1, 10, 0.045) # x=1, N=10, p=10/220=0.045
 # Geometric distribution
 scipy.stats.geom.pmf(10, 0.05)
 scipy.stats.geom.pmf(100, 0.05)
-scipy.stats.geom.cdf(5, 0.2)
+scipy.stats.geom.cdf(4, 0.2)
 
 # Negative binomial distribution
 # Calculate the probability of the lake freezing three times for a period of 10 and 100 years
@@ -83,7 +83,7 @@ from numpy.random import binomial
 seed(1)
 
 #generate sample of 200 values that follow a normal distribution 
-normalised_data = normal(loc=0, scale=1, size=1200)
+normalised_data = normal(loc=0, scale=1, size=120000)
 
 plt.hist(normalised_data)
 plt.show()
@@ -99,7 +99,7 @@ plt.show()
 sm.qqplot(binomial_data, line ='45')
 plt.show()
 
-sm.qqplot(binomial_data, dist=scipy.stats.binom(10, 0.045), line ='45')
+sm.qqplot(binomial_data, scipy.stats.binom(10, 0.045), line ='45')
 plt.show()
 
 df = pd.read_csv("Hellenicon_data.csv", index_col=0, parse_dates=True, sep=';')
