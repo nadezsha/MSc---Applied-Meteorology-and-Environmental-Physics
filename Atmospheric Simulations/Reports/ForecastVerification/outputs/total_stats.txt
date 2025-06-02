@@ -1,0 +1,20 @@
+--- ME and MSE values ---
+Annual ME: 1.27°C
+Annual MSE: 3.81°C²
+Annual Mean ME: 1.27°C
+Annual Mean MSE: 2.52°C²
+Annual Max ME: 1.17°C
+Annual Max MSE: 3.28°C²
+Annual Min ME: 1.49°C
+Annual Min MSE: 3.83°C²
+95th Percentile (Warm Day Threshold): 30.7°C
+--- Indexes ---
+POD = a / (a + c): 0.93
+FAR = b / (a + b): 0.34
+CSI = a / (a + b + c): 0.63
+--- Contingency Table (a, b, c, d) ---
+a = Hits: 383
+b = False Alarms: 196
+c = Misses: 28
+d = Correct Non-events: 7601
+Total (a + b + c + d): 8208
