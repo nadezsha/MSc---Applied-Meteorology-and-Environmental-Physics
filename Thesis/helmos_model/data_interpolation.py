@@ -14,9 +14,13 @@ import pandas as pd
 # === USER SETTINGS ===
 INPUT_DIR = Path(r"c:\MSc - Applied Meteorology and Environmental Physics\MSc Thesis\helmos_model\outputs")
 FILE_GLOB = "typical_profile_sza_*.OUT"
-OUT_CSV = Path("integrated_irradiance_by_sza.csv")
 
-# Column names 
+OUT_DIR = INPUT_DIR.parent / "intergrated_data"  
+OUT_DIR.mkdir(exist_ok=True)                      
+OUT_CSV = OUT_DIR / "integrated_irradiance_by_sza.csv"
+
+
+# column names 
 COLS = [
     "wavelength",
     "direct_horiz",          # DNI * cos(SZA)
@@ -27,7 +31,7 @@ COLS = [
     "uavg_diffuse_up",
 ]
 
-# Extract SZA from filenames like "..._sza_15.0.OUT"
+# extract SZA from filenames 
 SZA_RE = re.compile(r"sza_([0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
 
 
@@ -50,7 +54,7 @@ def robust_read(fp: Path, skiprows: int = 9) -> pd.DataFrame:
             if len(parts) < 7:
                 continue
             parts = parts[:7]
-            # Convert to floats; if a token is non-numeric, skip the line
+            # convert to floats; if a token is non-numeric, skip the line
             try:
                 vals = [float(x) for x in parts]
             except ValueError:
@@ -66,7 +70,8 @@ def robust_read(fp: Path, skiprows: int = 9) -> pd.DataFrame:
             rows.append(vals)
 
     df = pd.DataFrame(rows, columns=COLS)
-    # Sort by wavelength & drop dup wavelengths (keep first)
+    
+    # sort by wavelength & drop dup wavelengths (keep first)
     if not df.empty:
         df = df.sort_values("wavelength").drop_duplicates(subset="wavelength", keep="first")
     return df.reset_index(drop=True)
@@ -142,8 +147,7 @@ def main():
             "total_global_horiz": total_global_horiz,          # GHI
             "dni_reconstructed": dni_from_dirh,                # from DirH / cos(SZA)
             "ghi_from_identity": ghi_from_identity,            # DHI + DNI*cos(SZA)
-            "ghi_check_error": ghi_check_error,                # should be ~0 (round-off)
-            "n_points": int(len(df))
+            "ghi_check_error": ghi_check_error                 # should be ~0 (round-off)
         })
 
     result = pd.DataFrame(rows).sort_values("sza_deg").reset_index(drop=True)
