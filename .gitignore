@@ -1,0 +1,7 @@
+# Ignore typical large or temporary files
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+__pycache__/
