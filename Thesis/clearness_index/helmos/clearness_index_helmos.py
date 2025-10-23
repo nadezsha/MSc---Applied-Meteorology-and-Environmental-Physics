@@ -100,8 +100,9 @@ def load_and_prepare_obs(folder, mode="ghi"):
         raise ValueError("mode must be 'ghi' or 'dni'")
 
     # Parse datetime, sort, drop duplicates
-    out["Datetime"] = pd.to_datetime(out["Datetime"])
-    out = out.sort_values("Datetime").drop_duplicates(subset=["Datetime"])
+    out["Datetime"] = pd.to_datetime(out["Datetime"], utc=True, errors="coerce").dt.floor("T")
+    out = out.dropna(subset=["Datetime"])
+    out = out.sort_values("Datetime").drop_duplicates(subset=["Datetime"], keep="last")
     return out
 
 def load_theoretical(csv_path):
@@ -185,6 +186,19 @@ def plot_timeseries(df, col, out_path, ylim=None):
     fig.savefig(out_path, dpi=150)
     plt.close(fig)
 
+def qc_summary(df):
+    n = len(df)
+    neg_dhi_preclip = ((df["GHI_Wm2"] - df["DNI_Wm2"] * np.cos(np.deg2rad(df["solar_zenith_deg"]))) < 0).sum()
+    nan_theory = df[["GHI_theo_Wm2", "DHI_theo_Wm2", "DNI_theo_Wm2"]].isna().any(axis=1).sum()
+    nan_kts = df[["Kt_GHI","Kt_DHI","Kt_DNI"]].isna().any(axis=1).sum()
+    lines = [
+        f"Rows after daytime filter: {n}",
+        f"Pre-clip negative DHI rows: {neg_dhi_preclip}",
+        f"Rows with any NaN in theory fields: {nan_theory}",
+        f"Rows with any NaN in Kt fields: {nan_kts}",
+    ]
+    return "\n".join(lines)
+
 def main():
     ghi_obs = load_and_prepare_obs(GHI_DIR, mode="ghi")
     dni_obs = load_and_prepare_obs(DNI_DIR, mode="dni")
@@ -205,7 +219,7 @@ def main():
     df["Kt_DNI"] = safe_div(df["DNI_Wm2"].to_numpy(), df["DNI_theo_Wm2"].to_numpy())
 
     # Optional: keep only daytime (cosZ > 0) rows
-    mask_day = cosz > 0
+    mask_day = cosz > 0.01
     if mask_day.any():
         df = df.loc[mask_day].copy()
 
@@ -224,6 +238,9 @@ def main():
     for col, path in PLOT_FILES.items():
         # Let y-limits auto-scale for visibility
         plot_timeseries(df, col, path, ylim=None)
+
+    # QC summary to text file
+    (OUT_DIR / "qc_summary.txt").write_text(qc_summary(df), encoding="utf-8")
 
 if __name__ == "__main__":
     main()
