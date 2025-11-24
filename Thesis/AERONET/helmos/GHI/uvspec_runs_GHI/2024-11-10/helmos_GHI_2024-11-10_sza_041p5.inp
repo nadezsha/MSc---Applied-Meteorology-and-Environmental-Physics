@@ -1,0 +1,22 @@
+# GHI file for Helmos using inversion inputs
+atmosphere_file /home/nadezsha/libRadtran-2.0.6/data/atmmod/afglmw.dat
+source solar /home/nadezsha/libRadtran-2.0.6/data/solar_flux/kurudz_1.0nm.dat
+
+wavelength 400 1100
+spline 400 1100 1
+
+mol_abs_param SBDART
+altitude 1.75
+rte_solver sdisort
+number_of_streams 4
+
+output_user lambda edir edn eup
+sza 41.5
+
+# ---- Aerosol: Angström + SSA + asymmetry factor ----
+aerosol_default
+aerosol_angstrom 1.406632 0.017804
+aerosol_modify ssa set 0.707575
+aerosol_modify gg set 0.669608
+
+quiet
