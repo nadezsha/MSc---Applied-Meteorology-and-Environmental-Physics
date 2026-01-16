@@ -1,0 +1,25 @@
+# file for Epanomi
+atmosphere_file /home/nadezsha/libRadtran-2.0.6/data/atmmod/afglms.dat
+source solar /home/nadezsha/libRadtran-2.0.6/data/solar_flux/kurudz_1.0nm.dat
+
+wavelength 400 1100
+spline 400 1100 1          # 1 nm output grid
+
+mol_abs_param SBDART
+altitude 0.015               # km a.s.l.
+rte_solver sdisort
+number_of_streams 4
+
+# outputs
+output_user lambda edir edn eup
+sza 55.0
+
+# ---- AEROSOL (Angstrom law) ----
+aerosol_default
+aerosol_angstrom 1.125852 0.063435
+
+# ---- WATER VAPOUR COLUMN ----
+mol_modify H2O 22.1477 MM
+
+quiet
+

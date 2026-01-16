@@ -35,7 +35,7 @@ import matplotlib.pyplot as plt
 # === INPUTS ===
 GHI_DIR = r"C:\MSc - Applied Meteorology and Environmental Physics\MSc Thesis\data\helmos\eko-ms711-helmos\2024\sza_calculation"
 DNI_DIR = r"C:\MSc - Applied Meteorology and Environmental Physics\MSc Thesis\data\helmos\eko-ms711-dni-helmos\2024\sza_calculation"
-THEO_CSV = r"C:\MSc - Applied Meteorology and Environmental Physics\MSc Thesis\helmos_model\intergrated_data\integrated_irradiance_by_sza_ecc_corrected.csv"
+THEO_CSV = r"C:\MSc - Applied Meteorology and Environmental Physics\MSc Thesis\helmos_only_molecular\helmos_model\integrated_data\integrated_irradiance_by_sza_ecc_corrected.csv"
 
 # === OUTPUTS ===
 OUT_DIR = Path(r"C:\MSc - Applied Meteorology and Environmental Physics\MSc Thesis\clearness_index\helmos")

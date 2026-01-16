@@ -1,0 +1,4 @@
+Rows after daytime filter: 28047
+Pre-clip negative DHI rows: 5
+Rows with any NaN in theory fields: 0
+Rows with any NaN in Kt fields: 20770

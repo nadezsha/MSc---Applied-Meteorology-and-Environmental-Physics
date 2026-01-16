@@ -1,0 +1,22 @@
+# GHI file for Epanomi using inversion inputs
+atmosphere_file /home/nadezsha/libRadtran-2.0.6/data/atmmod/afglms.dat
+source solar /home/nadezsha/libRadtran-2.0.6/data/solar_flux/kurudz_1.0nm.dat
+
+wavelength 400 1100
+spline 400 1100 1
+
+mol_abs_param SBDART
+altitude 0.015
+rte_solver sdisort
+number_of_streams 4
+
+output_user lambda edir edn eup
+sza 26.5
+
+# ---- Aerosol: Angström + SSA + asymmetry factor ----
+aerosol_default
+aerosol_angstrom 1.039951 0.128039
+aerosol_modify ssa set 0.986867
+aerosol_modify gg set 0.651204
+
+quiet
